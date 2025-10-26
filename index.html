@@ -154,6 +154,10 @@
       <form id="edit_account_form" class="modal">
         <div id="account_name">Account</div>
 
+        <input type="number" name="account_value" placeholder="Value" />
+
+        <button type="submit">Save</button>
+
         <button type="button" id="delete_account">Delete Account</button>
       </form>
     </main>
@@ -169,6 +173,7 @@
       const $$ = (q) => document.querySelectorAll(q)
       const modalOverlay = $('#modal_overlay')
       const newAccountForm = $('#new_account_form')
+      const editAccountForm = $('#edit_account_form')
       let activeModal = undefined;
       let activeAccount = undefined;
 
@@ -318,7 +323,6 @@
             activeAccount = account
             modalOverlay.classList.add('shown')
 
-            const editAccountForm = $('#edit_account_form')
             editAccountForm.classList.add('shown')
             activeModal = editAccountForm
             renderEditAccountForm()
@@ -328,6 +332,7 @@
 
       function renderEditAccountForm() {
         $('#account_name').textContent = activeAccount.name
+        $('#edit_account_form input[name="account_value"]').value = activeAccount.value
         $('#delete_account').addEventListener('click', () => {
           console.log(activeAccount)
           commit({ accounts: netWorthData.accounts.filter(a => a.id !== activeAccount.id) })
@@ -335,6 +340,37 @@
           renderEverything()
         })
       }
+
+      function getNetWorthSnapshot() {
+        return JSON.parse(JSON.stringify(netWorthData))
+      }
+
+      editAccountForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!activeAccount) {
+          return
+        }
+        const form = e.target
+        const data = new FormData(form)
+        const newValue = parseInt(data.get("account_value")) || 0
+
+        if (activeAccount.value === newValue) {
+          return
+        }
+
+        // const nextNetWorthData = getNetWorthSnapshot()
+        // const account = nextNetWorthData.accounts.find(a => a.id === activeAccount.id)
+        // account.value = newValue
+
+        // commit(nextNetWorthData)
+
+        activeAccount.value = newValue
+        commit(netWorthData)
+
+        closeActiveModal()
+        renderEverything()
+        form.reset()
+      })
 
       function initialize() {
         renderEverything()
