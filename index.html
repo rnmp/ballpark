@@ -33,7 +33,7 @@
         flex-direction: column;
         flex: 1;
 
-        font-family: monaco;
+        font-family: monaco, monospace;
         color: var(--text-color);
         background-color: var(--background-color);
       }
@@ -178,6 +178,10 @@
       function newID () { return crypto.randomUUID() }
       let netWorthData = JSON.parse(localStorage.getItem('netWorth')) || { accounts: [] }
       function commit(newData) {
+        if (newData === netWorthData) {
+          // Need to enforce in order to support history
+          throw 'nope'
+        }
         localStorage.setItem("netWorth", JSON.stringify(newData))
         console.log(JSON.stringify(newData, null, 2))
         netWorthData = newData
@@ -251,8 +255,9 @@
         const initialValue = parseInt(data.get("initial_value")) || 0
         const accountType = data.get("account_type")
 
-        netWorthData.accounts.push({ id: newID(), name, account_type: accountType, value: initialValue, history: [] })
-        commit(netWorthData)
+        const snapshot = getNetWorthSnapshot()
+        snapshot.accounts.push({ id: newID(), name, account_type: accountType, value: initialValue, history: [] })
+        commit(snapshot)
         closeActiveModal()
         renderEverything()
         form.reset()
@@ -347,8 +352,9 @@
         $('#account_name').textContent = activeAccount.name
         $('#edit_account_form input[name="account_value"]').value = activeAccount.value
         $('#delete_account').addEventListener('click', () => {
-          console.log(activeAccount)
-          commit({ accounts: netWorthData.accounts.filter(a => a.id !== activeAccount.id) })
+          const snapshot = getNetWorthSnapshot()
+          snapshot.accounts = snapshot.accounts.filter(a => a.id !== activeAccount.id)
+          commit(snapshot)
           closeActiveModal()
           renderEverything()
         })
@@ -371,14 +377,10 @@
           return
         }
 
-        // const nextNetWorthData = getNetWorthSnapshot()
-        // const account = nextNetWorthData.accounts.find(a => a.id === activeAccount.id)
-        // account.value = newValue
-
-        // commit(nextNetWorthData)
-
-        activeAccount.value = newValue
-        commit(netWorthData)
+        const snapshot = getNetWorthSnapshot()
+        const snapshotAccount = snapshot.accounts.find(a => a.id === activeAccount.id)
+        snapshotAccount.value = newValue
+        commit(snapshot)
 
         closeActiveModal()
         renderEverything()
