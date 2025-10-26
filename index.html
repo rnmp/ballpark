@@ -40,16 +40,29 @@
 
       main {
         flex: 1;
-        border: 1px solid var(--text-color);
+        border: 0.5px solid var(--text-color);
+        border-radius: 0.75rem;
         overflow: scroll;
       }
       #total_container {
         padding: 1rem;
       }
+      #total_container > h1 {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+      #total_container > h2 {
+        font-size: 1.75rem;
+      }
 
       .account {
-        border-top: 1px solid var(--text-color);
+        border-top: 0.5px solid var(--text-color);
         padding: 1rem;
+      }
+      .account > h1 {
+        font-weight: 600;
+        font-size: 0.75rem;
+        margin-bottom: 0.25rem;
       }
 
       #modal_overlay {
@@ -81,7 +94,7 @@
         left: 50%;
         padding: 20px;
         transform: translateX(-50%) translateY(-50%);
-        border: 1px solid var(--text-color);
+        border: 0.5px solid var(--text-color);
       }
 
       #modal_overlay.shown {
@@ -100,7 +113,7 @@
       button {
         appearance: none;
         -webkit-appearance: none;
-        border: 1px solid var(--text-color);
+        border: 0.5px solid var(--text-color);
         background: var(--background-color);
         color: var(--text-color);
         font-family: inherit;
@@ -119,7 +132,7 @@
         <h1>BALLPARK</h1>
         <h2 id="total"></h2>
         <div id="temp_action">
-          <button id="new_account" type="submit">New Account</button>
+          <button id="new_account" type="submit">+ Account</button>
           <button id="settings_button" type="submit">Settings</button>
         </div>
       </header>
@@ -266,12 +279,12 @@
           case "student_loan": return '🎓'
           case "car_loan": return '🚗'
           case "mortgage": return '🏠'
-          default: return '📈'
+          default: return '🏛️'
         }
       }
 
       function accountValue(account) {
-        const factor = isLiability(account) ? -1 : +1
+        const factor = isLiability(account) && account.value > 0 ? -1 : +1
         return (account.value * factor)
       }
 
@@ -303,8 +316,8 @@
         const accountsUI = netWorthData.accounts.reduce((ui, account) => {
           const accountUI = `
             <div class="account" data-id="${account.id}">
-            <h1>${accountEmoji(account)} ${account.name}</h1>
-            <h2>${money(accountValue(account))}</h2>
+              <h1>${accountEmoji(account)} ${account.name}</h1>
+              <h2>${money(accountValue(account))}</h2>
             </div>
             `
           return ui + accountUI
