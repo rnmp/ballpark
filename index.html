@@ -5,12 +5,14 @@
     <style>
       :root {
         --background-color: #fff;
+        --background-color-highlight: #E4F1F0;
         --text-color: #000;
       }
 
       @media (prefers-color-scheme: dark) {
         :root {
           --background-color: #000;
+          --background-color-highlight: #111;
           --text-color: #fff;
         }
       }
@@ -36,19 +38,23 @@
         font-family: monaco, monospace;
         color: var(--text-color);
         background-color: var(--background-color);
+        background-image: linear-gradient(var(--background-color), var(--background-color-highlight));
       }
 
       main {
         flex: 1;
         border: 0.5px solid var(--text-color);
-        border-radius: 0.75rem;
+        border-bottom-width: 1.5px;
+        border-right-width: 1px;
+        border-radius: 0.85rem;
         overflow: scroll;
       }
       #total_container {
-        padding: 1rem;
+        padding: 1.5rem;
       }
       #total_container > h1 {
         font-weight: 600;
+        font-family: futura;
         margin-bottom: 0.25rem;
       }
       #total_container > h2 {
@@ -56,13 +62,26 @@
       }
 
       .account {
-        border-top: 0.5px solid var(--text-color);
-        padding: 1rem;
+        display: flex;
+        gap: 1rem;
+        border-top: 0.5px dashed var(--text-color);
+        padding: 0.85rem 1.5rem;
       }
-      .account > h1 {
+      .account h1 {
         font-weight: 600;
         font-size: 0.75rem;
         margin-bottom: 0.25rem;
+      }
+      .account .icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        border: 0.5px solid var(--text-color);
+        border-bottom-width: 1.5px;
+        border-right-width: 1px;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       #modal_overlay {
@@ -95,6 +114,9 @@
         padding: 20px;
         transform: translateX(-50%) translateY(-50%);
         border: 0.5px solid var(--text-color);
+        border-bottom-width: 1.5px;
+        border-right-width: 1px;
+        border-radius: 0.85rem;
       }
 
       #modal_overlay.shown {
@@ -109,19 +131,34 @@
       #settings.shown {
         display: block;
       }
+      #undo, #redo {
+        display: none;
+      }
+      #undo.shown, #redo.shown {
+        display: block;
+      }
 
       button {
         appearance: none;
         -webkit-appearance: none;
         border: 0.5px solid var(--text-color);
+        border-bottom-width: 1.5px;
+        border-right-width: 1px;
+        border-radius: 0.35rem;
         background: var(--background-color);
         color: var(--text-color);
         font-family: inherit;
-        font-size: 0.85rem;
-        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.65rem;
+      }
+
+      .spacer {
+        flex: 1;
       }
 
       #temp_action {
+        display: flex;
+        gap: 0.5rem;
         margin-top: 1rem;
       }
     </style>
@@ -132,8 +169,11 @@
         <h1>BALLPARK</h1>
         <h2 id="total"></h2>
         <div id="temp_action">
-          <button id="new_account" type="submit">+ Account</button>
-          <button id="settings_button" type="submit">Settings</button>
+          <button id="new_account">+ Account</button>
+          <button id="settings_button">Settings</button>
+          <div class="spacer"></div>
+          <button id="undo">Undo</button>
+          <button id="redo">Redo</button>
         </div>
       </header>
       <div id="accounts">
@@ -175,24 +215,59 @@
       </form>
     </main>
     <script>
+      const $ = (q) => document.querySelector(q)
+      const $$ = (q) => document.querySelectorAll(q)
       function newID () { return crypto.randomUUID() }
-      let netWorthData = JSON.parse(localStorage.getItem('netWorth')) || { accounts: [] }
-      function commit(newData) {
-        if (newData === netWorthData) {
+
+      let netWorthData = { accounts: [] }
+      try {
+        netWorthData = JSON.parse(localStorage.getItem('netWorth')) 
+      } catch(e) {
+      }
+      Object.freeze(netWorthData)
+
+      let undos = []
+      let redos = []
+      function commit(newData, opts = {}) {
+        if (!newData || newData === netWorthData) {
           // Need to enforce in order to support history
           throw 'nope'
         }
+        if (opts.undoing) {
+          redos.push(netWorthData)
+        } else {
+          undos.push(netWorthData)
+        }
+        // console.log("undos", undos)
+        // console.log("redos", redos)
+
         localStorage.setItem("netWorth", JSON.stringify(newData))
-        console.log(JSON.stringify(newData, null, 2))
+        // console.log(JSON.stringify(newData, null, 2))
         netWorthData = newData
+        Object.freeze(netWorthData)
+
+        $('#undo').classList.toggle('shown', Boolean(undos.length))
+        $('#redo').classList.toggle('shown', Boolean(redos.length))
       }
-      const $ = (q) => document.querySelector(q)
-      const $$ = (q) => document.querySelectorAll(q)
       const modalOverlay = $('#modal_overlay')
       const newAccountForm = $('#new_account_form')
       const editAccountForm = $('#edit_account_form')
       let activeModal = undefined;
       let activeAccount = undefined;
+
+      $('#undo').addEventListener('click', () => {
+        const snapshot = undos.pop()
+        commit(snapshot, { undoing: true })
+
+        renderEverything()
+      })
+
+      $('#redo').addEventListener('click', () => {
+        const snapshot = redos.pop()
+        commit(snapshot)
+
+        renderEverything()
+      })
 
       $('#new_account').addEventListener('click',  () => {
         modalOverlay.classList.add('shown')
@@ -321,13 +396,15 @@
         const accountsUI = netWorthData.accounts.reduce((ui, account) => {
           const accountUI = `
             <div class="account" data-id="${account.id}">
-              <h1>${accountEmoji(account)} ${account.name}</h1>
-              <h2>${money(accountValue(account))}</h2>
+              <div class="icon">${accountEmoji(account)}</div>
+              <header>
+                <h1>${account.name}</h1>
+                <h2>${money(accountValue(account))}</h2>
+              </header>
             </div>
             `
           return ui + accountUI
         }, "")
-        console.log(accountsUI)
 
         $('#accounts').innerHTML = accountsUI
       }
