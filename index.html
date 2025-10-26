@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Ballpark - Calculate &amp; track your net worth</title>
+    <style>
+      :root {
+        --background-color: #fff;
+        --text-color: #000;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background-color: #000;
+          --text-color: #fff;
+        }
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        font-size: 1rem;
+        font-weight: 400;
+        box-sizing: border-box;
+      }
+      html {
+        padding: 1rem;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+
+        font-family: monaco;
+        color: var(--text-color);
+        background-color: var(--background-color);
+      }
+
+      main {
+        flex: 1;
+        border: 1px solid var(--text-color);
+        overflow: scroll;
+      }
+      #total_container {
+        padding: 1rem;
+      }
+
+      .account {
+        border-top: 1px solid var(--text-color);
+        padding: 1rem;
+      }
+
+      #modal_overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: var(--background-color);
+        opacity: 0.8;
+      }
+
+      #new_account_form {
+        display: none;
+      }
+      #edit_account_form {
+        display: none;
+      }
+      #settings {
+        display: none;
+      }
+
+      .modal {
+        background: var(--background-color);
+        width: 400px;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        padding: 20px;
+        transform: translateX(-50%) translateY(-50%);
+        border: 1px solid var(--text-color);
+      }
+
+      #modal_overlay.shown {
+        display: block;
+      }
+      #new_account_form.shown {
+        display: block;
+      }
+      #edit_account_form.shown {
+        display: block;
+      }
+      #settings.shown {
+        display: block;
+      }
+
+      button {
+        appearance: none;
+        -webkit-appearance: none;
+        border: 1px solid var(--text-color);
+        background: var(--background-color);
+        color: var(--text-color);
+        font-family: inherit;
+        font-size: 0.85rem;
+        padding: 0.2rem 0.5rem;
+      }
+
+      #temp_action {
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header id="total_container">
+        <h1>BALLPARK</h1>
+        <h2 id="total"></h2>
+        <div id="temp_action">
+          <button id="new_account" type="submit">New Account</button>
+          <button id="settings_button" type="submit">Settings</button>
+        </div>
+      </header>
+      <div id="accounts">
+      </div>
+      <div id="modal_overlay"></div>
+      <form id="new_account_form" class="modal">
+        <input type="text" name="name" placeholder="Name" />
+        <select name="account_type">
+          <option value="savings">Savings</option>
+          <option value="investments">Investments</option>
+          <option value="property">Property</option>
+          <option value="student_loan">Student Loan</option>
+          <option value="car_loan">Car Loan</option>
+          <option value="mortgage">Mortgate</option>
+        </select>
+        <input type="number" name="initial_value" placeholder="Value" />
+
+        <hr />
+        <button type="submit">Create Account</button>
+      </form>
+
+      <div id="settings" class="modal">
+        <h1>Settings</h1>
+
+        <input type="file" id="import_data_file_picker" accept=".json" style="display: none;" />
+        <button type="button" id="import_data">Import Data</button>
+        <button type="button" id="export_data">Export Data</button>
+        <button type="button" id="reset_data_button">Reset</button>
+      </div>
+
+      <form id="edit_account_form" class="modal">
+        <div id="account_name">Account</div>
+
+        <button type="button" id="delete_account">Delete Account</button>
+      </form>
+    </main>
+    <script>
+      function newID () { return crypto.randomUUID() }
+      let netWorthData = JSON.parse(localStorage.getItem('netWorth')) || { accounts: [] }
+      function commit(newData) {
+        localStorage.setItem("netWorth", JSON.stringify(newData))
+        console.log(JSON.stringify(newData, null, 2))
+        netWorthData = newData
+      }
+      const $ = (q) => document.querySelector(q)
+      const $$ = (q) => document.querySelectorAll(q)
+      const modalOverlay = $('#modal_overlay')
+      const newAccountForm = $('#new_account_form')
+      let activeModal = undefined;
+      let activeAccount = undefined;
+
+      $('#new_account').addEventListener('click',  () => {
+        modalOverlay.classList.add('shown')
+        newAccountForm.classList.add('shown')
+        activeModal = newAccountForm
+      })
+
+      $('#settings_button').addEventListener('click', () => {
+        modalOverlay.classList.add('shown')
+        const settingsModal = $('#settings')
+        settingsModal.classList.add('shown')
+        activeModal = settingsModal
+
+      })
+
+      $('#import_data').addEventListener('click', () => {
+        $('#import_data_file_picker').click()
+      })
+
+      function validateImport(jsonString) {
+        // TODO: implement me
+        return JSON.parse(jsonString)
+      }
+
+      $('#import_data_file_picker').addEventListener('change', async (event) => {
+        const selectedFile = $('#import_data_file_picker').files[0]
+        if (!selectedFile) {
+          alert('Something went wrong!!!!')
+        }
+
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          const validatedImport = validateImport(e.target.result)
+          if (validatedImport) {
+            commit(validatedImport)
+            renderEverything()
+          }
+        }
+        reader.readAsText(selectedFile)
+      })
+
+      $('#export_data').addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(netWorthData, null, 2)]);
+        const link = document.createElement("a");
+        link.download = 'download.json';
+        link.href = window.URL.createObjectURL(blob);
+        link.click()
+      })
+
+      $('#reset_data_button').addEventListener('click', () => {
+        commit({ accounts: [] })
+        renderEverything()
+      })
+
+      newAccountForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = e.target
+        const data = new FormData(form)
+        const name = data.get("name") || "Account"
+        const initialValue = parseInt(data.get("initial_value")) || 0
+        const accountType = data.get("account_type")
+
+        netWorthData.accounts.push({ id: newID(), name, account_type: accountType, value: initialValue, history: [] })
+        commit(netWorthData)
+        closeActiveModal()
+        renderEverything()
+        form.reset()
+      })
+
+      function closeActiveModal() {
+        activeModal.classList.remove('shown')
+        modalOverlay.classList.remove('shown')
+      }
+
+      modalOverlay.addEventListener('click', () => {
+        closeActiveModal()
+      })
+
+      function isLiability (account) {
+        return ['car_loan', 'student_loan', 'mortgage'].includes(account.account_type)
+      }
+
+      function accountEmoji(account) {
+        switch (account.account_type) {
+          case "savings": return '💰'
+          case "investments": return '📈'
+          case "property": return '🏠'
+          case "student_loan": return '🎓'
+          case "car_loan": return '🚗'
+          case "mortgage": return '🏠'
+          default: return '📈'
+        }
+      }
+
+      function accountValue(account) {
+        const factor = isLiability(account) ? -1 : +1
+        return (account.value * factor)
+      }
+
+      function renderTotal() {
+        const total = netWorthData.accounts.reduce((total, account) => {
+          return total + accountValue(account) 
+        }, 0)
+        const totalDisplay = $('#total')
+        totalDisplay.textContent = money(total ?? 0)
+      }
+
+      function renderEverything() {
+        renderTotal()
+        renderAccounts()
+      }
+
+      const formatter = new Intl.NumberFormat("en-US", { 
+        style: "currency", 
+        currency: "USD", 
+        maximumSignificantDigits: 4, 
+        notation: "compact", 
+      })
+
+      function money(int) {
+        return formatter.format(int)
+      }
+
+      function renderAccounts() {
+        const accountsUI = netWorthData.accounts.reduce((ui, account) => {
+          const accountUI = `
+            <div class="account" data-id="${account.id}">
+            <h1>${accountEmoji(account)} ${account.name}</h1>
+            <h2>${money(accountValue(account))}</h2>
+            </div>
+            `
+          return ui + accountUI
+        }, "")
+        console.log(accountsUI)
+
+        $('#accounts').innerHTML = accountsUI
+      }
+
+      document.addEventListener('click', (event) => {
+        const accountElement = event.target.closest('.account')
+        if (accountElement) {
+          const accountId = accountElement.dataset.id
+          const account = netWorthData.accounts.find(a => a.id === accountId)
+          if (account) {
+            activeAccount = account
+            modalOverlay.classList.add('shown')
+
+            const editAccountForm = $('#edit_account_form')
+            editAccountForm.classList.add('shown')
+            activeModal = editAccountForm
+            renderEditAccountForm()
+          }
+        }
+      })
+
+      function renderEditAccountForm() {
+        $('#account_name').textContent = activeAccount.name
+        $('#delete_account').addEventListener('click', () => {
+          console.log(activeAccount)
+          commit({ accounts: netWorthData.accounts.filter(a => a.id !== activeAccount.id) })
+          closeActiveModal()
+          renderEverything()
+        })
+      }
+
+      function initialize() {
+        renderEverything()
+        console.log(JSON.stringify(netWorthData, null, 2))
+      }
+      initialize()
+
+    </script>
+  </body>
+</html>
