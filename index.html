@@ -223,7 +223,10 @@
 
       let netWorthData = { accounts: [] }
       try {
-        netWorthData = JSON.parse(localStorage.getItem('netWorth')) 
+        const parsedNetWorthData = JSON.parse(localStorage.getItem('netWorth'))
+        if (parsedNetWorthData) {
+          netWorthData = parsedNetWorthData
+        }
       } catch(e) {
       }
       Object.freeze(netWorthData)
