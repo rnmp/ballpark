@@ -22,7 +22,7 @@ export function accountValue(account) {
 const formatter = new Intl.NumberFormat("en-US", { 
   style: "currency", 
   currency: "USD", 
-  maximumSignificantDigits: 4, 
+  maximumSignificantDigits: 3, 
   notation: "compact", 
 })
 
