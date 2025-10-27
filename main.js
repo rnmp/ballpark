@@ -99,7 +99,7 @@ function renderTotal() {
     return total + accountValue(account) 
   }, 0)
   const totalDisplay = $('#total')
-  totalDisplay.textContent = money(total ?? 0)
+  totalDisplay.textContent = money(total ?? 0, 'total')
 }
 
 function renderToolbar() {

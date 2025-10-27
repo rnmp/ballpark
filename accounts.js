@@ -19,13 +19,23 @@ export function accountValue(account) {
   return (account.value * factor)
 }
 
-const formatter = new Intl.NumberFormat("en-US", { 
+const accountFormatter = new Intl.NumberFormat("en-US", { 
+  style: "currency", 
+  currency: "USD", 
+  maximumFractionDigits: 0,
+})
+
+const netWorthFormatter = new Intl.NumberFormat("en-US", { 
   style: "currency", 
   currency: "USD", 
   maximumSignificantDigits: 3, 
   notation: "compact", 
 })
 
-export function money(int) {
-  return formatter.format(int)
+export function money(int, mode) {
+  if (mode === 'total') {
+    return netWorthFormatter.format(int)
+  }
+  
+  return accountFormatter.format(int)
 }
