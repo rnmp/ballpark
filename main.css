@@ -1,0 +1,198 @@
+:root {
+  --background-color: #fff;
+  --background-color-highlight: #E4F1F0;
+  --button-background-color: #fff;
+  --text-color: #000;
+  --input-color: #eee;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #000;
+    --background-color-highlight: #111;
+    --button-background-color: #111;
+    --text-color: #fff;
+    --input-color: #444;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 400;
+  box-sizing: border-box;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none; /* Removes the default appearance of the spin buttons */
+  margin: 0; /* Ensures no extra margin is added */
+}
+
+/* For Mozilla Firefox */
+input[type="number"] {
+  -moz-appearance: textfield; /* Makes the number input appear like a standard text field */
+}
+html {
+  padding: 1rem;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  font-family: IBM Plex Mono, monospace;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  background-image: linear-gradient(var(--background-color), var(--background-color-highlight));
+}
+
+main {
+  flex: 1;
+  border: 0.5px solid var(--text-color);
+  border-bottom-width: 1.5px;
+  border-right-width: 1px;
+  border-radius: 0.85rem;
+  overflow: scroll;
+}
+#total_container {
+  padding: 1.5rem;
+}
+#total_container > h1 {
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+}
+#total_container > h2 {
+  font-size: 1.75rem;
+}
+
+.account {
+  display: flex;
+  gap: 1rem;
+  border-top: 0.5px dashed var(--text-color);
+  padding: 0.85rem 1.5rem;
+}
+.account h1 {
+  font-weight: 600;
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+.account .icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--button-background-color);
+  border: 0.5px solid var(--text-color);
+  border-bottom-width: 1.5px;
+  border-right-width: 1px;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#modal_overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--background-color);
+  opacity: 0.8;
+}
+
+#new_account_form {
+  display: none;
+}
+#edit_account_form {
+  display: none;
+}
+#settings {
+  display: none;
+}
+
+.flex {
+  display: flex;
+}
+
+.modal {
+  background: var(--background-color);
+  width: 400px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  padding: 20px;
+  transform: translateX(-50%) translateY(-50%);
+  border: 0.5px solid var(--text-color);
+  border-bottom-width: 1.5px;
+  border-right-width: 1px;
+  border-radius: 0.85rem;
+}
+
+#modal_overlay.shown {
+  display: block;
+}
+#new_account_form.shown {
+  display: block;
+}
+#edit_account_form.shown {
+  display: block;
+}
+#settings.shown {
+  display: block;
+}
+#undo, #redo {
+  display: none;
+}
+#undo.shown, #redo.shown {
+  display: block;
+}
+
+button {
+  background: var(--button-background-color);
+  color: var(--text-color);
+  font-family: inherit;
+}
+input, button, select, textarea {
+  display: block;
+  font: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.border-0 {
+  border: none;
+}
+.bg-transparent {
+  background: transparent;
+}
+
+input.form, button, select, textarea {
+  display: block;
+  font: inherit;
+  font-size: 0.75rem;
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 0.35rem;
+  border: 0.5px solid var(--text-color);
+  border-bottom-width: 1.5px;
+  border-right-width: 1px;
+  padding: 0.25rem 0.65rem;
+}
+input.form, textarea {
+  border-color: transparent;
+  background: var(--input-color);
+}
+
+.spacer {
+  flex: 1;
+}
+
+#temp_action {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+

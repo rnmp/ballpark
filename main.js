@@ -1,5 +1,5 @@
 import { commit, getSnapshot, undo, redo, getHistoryCounts } from './data.js'
-import { $ } from './dom.js'
+import { $, make } from './dom.js'
 import { isLiability, accountEmoji, accountValue, money } from './accounts.js'
 
 const modalOverlay = $('#modal_overlay')
@@ -115,38 +115,91 @@ function renderEverything() {
   renderToolbar()
 }
 
-function renderAccounts() {
-  const accountsUI = getSnapshot().accounts.reduce((ui, account) => {
-    const accountUI = `
-      <div class="account" data-id="${account.id}">
-      <div class="icon">${accountEmoji(account)}</div>
-      <header>
-      <h1>${account.name}</h1>
-      <h2>${money(accountValue(account))}</h2>
-      </header>
-      </div>
-      `
-    return ui + accountUI
-  }, "")
+function editableTitle(text, save) {
+  const title = make('h1')
+  title.textContent = text
 
-  $('#accounts').innerHTML = accountsUI
+  let editing = false
+
+  const input = make('input')
+  input.value = text
+  input.style.border = 'none'
+
+  const complete = () => {
+    if (!editing) {
+      return
+    }
+
+    editing = false 
+
+    title.innerHTML = input.value
+    save(input.value)
+  }
+  
+  input.addEventListener('blur', complete)
+
+  document.addEventListener('click', complete)
+
+  title.addEventListener('click', (event) => {
+    event.stopPropagation()
+
+    editing = true
+
+    title.innerHTML = ''
+    title.append(input)
+    input.focus()
+  })
+
+  return title
 }
 
-document.addEventListener('click', (event) => {
-  const accountElement = event.target.closest('.account')
-  if (accountElement) {
-    const accountId = accountElement.dataset.id
-    const account = getSnapshot().accounts.find(a => a.id === accountId)
-    if (account) {
-      activeAccount = account
-      modalOverlay.classList.add('shown')
+function renderAccount(account) {
+  const wrapper = make('div')
+  wrapper.classList.add('account')
+  wrapper.dataset.id = account.id
 
-      editAccountForm.classList.add('shown')
-      activeModal = editAccountForm
-      renderEditAccountForm()
-    }
-  }
-})
+  const emoji = make('div')
+  emoji.classList.add('icon')
+  emoji.textContent = accountEmoji(account)
+
+  emoji.addEventListener('click', () => {
+    activeAccount = account
+    modalOverlay.classList.add('shown')
+    editAccountForm.classList.add('shown')
+    activeModal = editAccountForm
+    renderEditAccountForm()
+  })
+
+  wrapper.appendChild(emoji)
+
+  const header = make('header')
+  wrapper.appendChild(header)
+
+  const name = editableTitle(account.name, (newName) => {
+    const snapshot = getSnapshot()
+    const snapshotAccount = snapshot.accounts.find(a => a.id === account.id)
+    snapshotAccount.name = newName
+    commit(snapshot)
+
+    // We don't need to render everything
+    renderToolbar()
+  })
+  header.appendChild(name)
+
+  const balance = make('h2')
+  balance.textContent = money(accountValue(account))
+  header.appendChild(balance)
+
+  return wrapper
+}
+
+function renderAccounts() {
+
+  const accountsUI = getSnapshot().accounts.map(renderAccount)
+
+  $('#accounts').innerHTML = ''
+  $('#accounts').append(...accountsUI)
+}
 
 function renderEditAccountForm() {
   $('#account_name').textContent = activeAccount.name

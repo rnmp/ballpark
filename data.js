@@ -24,6 +24,7 @@ export function commit(newData, opts = {}) {
     // Need to enforce in order to support history
     throw 'nope'
   }
+
   if (opts.undoing) {
     redos.push(netWorthData)
   } else {
