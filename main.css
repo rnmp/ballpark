@@ -134,14 +134,14 @@ main {
 
 .account {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   border-top: 0.5px solid var(--text-color);
   padding: 0.85rem 1.5rem;
+  align-items: center;
 }
 .account h1 {
   font-weight: 600;
   font-size: 0.75rem;
-  margin-bottom: 0.25rem;
 }
 .account .icon {
   width: 2.5rem;
@@ -214,5 +214,24 @@ main {
   display: flex;
   gap: 0.5rem;
   margin-top: 1rem;
+}
+
+.editable-text:not(:has(input)), .editable-text input {
+  border: 0.5px solid transparent;
+  border-radius: 4px;
+  padding: 2px 4px;
+  width: 200px;
+}
+
+.editable-text:not(:has(input)):hover {
+  border-color: var(--text-color)
+}
+
+.editable-text input {
+  outline: none;
+}
+
+.editable-text input:focus {
+  border-color: var(--text-color)
 }
 

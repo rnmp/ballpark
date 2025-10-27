@@ -118,13 +118,13 @@ function renderEverything() {
 function editableTitle(text, save, opts = {}) {
   const tag = opts.tag || 'h1'
   const title = make(tag)
+  title.className = 'editable-text'
   title.textContent = text
 
   let editing = false
 
   const input = make('input')
   input.value = opts.editText || text
-  input.style.border = 'none'
 
   const complete = () => {
     if (!editing) {
