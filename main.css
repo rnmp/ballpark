@@ -190,6 +190,9 @@ main {
   border-right-width: 1px;
   border-radius: 0.85rem;
 }
+.modal-title {
+  margin-bottom: 1rem;
+}
 
 #modal_overlay.shown {
   display: block;
@@ -235,3 +238,7 @@ main {
   border-color: var(--text-color)
 }
 
+.button-bar {
+  display: flex;
+  gap: 0.5rem;
+}

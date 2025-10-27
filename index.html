@@ -42,12 +42,14 @@
       </form>
 
       <div id="settings" class="modal">
-        <h1>Settings</h1>
+        <h1 class="modal-title">Settings</h1>
 
-        <input type="file" id="import_data_file_picker" accept=".json" style="display: none;" />
-        <button type="button" id="import_data">Import Data</button>
-        <button type="button" id="export_data">Export Data</button>
-        <button type="button" id="reset_data_button">Reset</button>
+        <div class="button-bar">
+          <input type="file" id="import_data_file_picker" accept=".json" style="display: none;" />
+          <button type="button" id="import_data">Import</button>
+          <button type="button" id="export_data">Export</button>
+          <button type="button" id="reset_data_button">Reset</button>
+        </div>
       </div>
     </main>
     <script type="module" src="./main.js"></script>
