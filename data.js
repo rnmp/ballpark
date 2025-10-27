@@ -29,6 +29,7 @@ export function commit(newData, opts = {}) {
     redos.push(netWorthData)
   } else {
     undos.push(netWorthData)
+    redos = []
   }
 
   localStorage.setItem("netWorth", JSON.stringify(newData))
