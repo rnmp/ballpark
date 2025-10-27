@@ -7,31 +7,41 @@
     <title>Ballpark - Calculate &amp; track your net worth</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-      :root {
-        --background-color: #fff;
-        --background-color-highlight: #E4F1F0;
-        --button-background-color: #fff;
-        --text-color: #000;
-        --input-color: #eee;
-      }
+:root {
+  --background-color: #fff;
+  --background-color-highlight: #E4F1F0;
+  --button-background-color: #fff;
+  --text-color: #000;
+  --input-color: #eee;
+}
 
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --background-color: #000;
-          --background-color-highlight: #111;
-          --button-background-color: #111;
-          --text-color: #fff;
-          --input-color: #444;
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --background-color: #000;
+            --background-color-highlight: #111;
+            --button-background-color: #111;
+            --text-color: #fff;
+            --input-color: #444;
+          }
         }
-      }
 
-      * {
-        margin: 0;
-        padding: 0;
-        font-size: 1rem;
-        font-weight: 400;
-        box-sizing: border-box;
-      }
+* {
+  margin: 0;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 400;
+  box-sizing: border-box;
+}
+      input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none; /* Removes the default appearance of the spin buttons */
+  margin: 0; /* Ensures no extra margin is added */
+}
+
+/* For Mozilla Firefox */
+input[type="number"] {
+  -moz-appearance: textfield; /* Makes the number input appear like a standard text field */
+}
       html {
         padding: 1rem;
         min-height: 100dvh;
@@ -158,6 +168,19 @@
       input, button, select, textarea {
         display: block;
         font: inherit;
+        appearance: none;
+        -webkit-appearance: none;
+      }
+      .border-0 {
+        border: none;
+      }
+      .bg-transparent {
+        background: transparent;
+      }
+
+      input.form, button, select, textarea {
+        display: block;
+        font: inherit;
         font-size: 0.75rem;
         appearance: none;
         -webkit-appearance: none;
@@ -167,7 +190,7 @@
         border-right-width: 1px;
         padding: 0.25rem 0.65rem;
       }
-      input, textarea {
+      input.form, textarea {
         border-color: transparent;
         background: var(--input-color);
       }
@@ -236,265 +259,5 @@
       </form>
     </main>
     <script type="module" src="./main.js"></script>
-    <script>
-      const $ = (q) => document.querySelector(q)
-      const $$ = (q) => document.querySelectorAll(q)
-      function newID () { return crypto.randomUUID() }
-
-      let netWorthData = { accounts: [] }
-      try {
-        const parsedNetWorthData = JSON.parse(localStorage.getItem('netWorth'))
-        if (parsedNetWorthData) {
-          netWorthData = parsedNetWorthData
-        }
-      } catch(e) {
-      }
-      Object.freeze(netWorthData)
-
-      let undos = []
-      let redos = []
-      function commit(newData, opts = {}) {
-        if (!newData || newData === netWorthData) {
-          // Need to enforce in order to support history
-          throw 'nope'
-        }
-        if (opts.undoing) {
-          redos.push(netWorthData)
-        } else {
-          undos.push(netWorthData)
-        }
-        // console.log("undos", undos)
-        // console.log("redos", redos)
-
-        localStorage.setItem("netWorth", JSON.stringify(newData))
-        // console.log(JSON.stringify(newData, null, 2))
-        netWorthData = newData
-        Object.freeze(netWorthData)
-
-        $('#undo').classList.toggle('shown', Boolean(undos.length))
-        $('#redo').classList.toggle('shown', Boolean(redos.length))
-      }
-      const modalOverlay = $('#modal_overlay')
-      const newAccountForm = $('#new_account_form')
-      const editAccountForm = $('#edit_account_form')
-      let activeModal = undefined;
-      let activeAccount = undefined;
-
-      $('#undo').addEventListener('click', () => {
-        const snapshot = undos.pop()
-        commit(snapshot, { undoing: true })
-
-        renderEverything()
-      })
-
-      $('#redo').addEventListener('click', () => {
-        const snapshot = redos.pop()
-        commit(snapshot)
-
-        renderEverything()
-      })
-
-      $('#new_account').addEventListener('click',  () => {
-        modalOverlay.classList.add('shown')
-        newAccountForm.classList.add('shown')
-        activeModal = newAccountForm
-      })
-
-      $('#settings_button').addEventListener('click', () => {
-        modalOverlay.classList.add('shown')
-        const settingsModal = $('#settings')
-        settingsModal.classList.add('shown')
-        activeModal = settingsModal
-
-      })
-
-      $('#import_data').addEventListener('click', () => {
-        $('#import_data_file_picker').click()
-      })
-
-      function validateImport(jsonString) {
-        // TODO: implement me
-        return JSON.parse(jsonString)
-      }
-
-      $('#import_data_file_picker').addEventListener('change', async (event) => {
-        const selectedFile = $('#import_data_file_picker').files[0]
-        if (!selectedFile) {
-          alert('Something went wrong!!!!')
-        }
-
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          const validatedImport = validateImport(e.target.result)
-          if (validatedImport) {
-            commit(validatedImport)
-            renderEverything()
-          }
-        }
-        reader.readAsText(selectedFile)
-      })
-
-      $('#export_data').addEventListener('click', () => {
-        const blob = new Blob([JSON.stringify(netWorthData, null, 2)]);
-        const link = document.createElement("a");
-        link.download = 'download.json';
-        link.href = window.URL.createObjectURL(blob);
-        link.click()
-      })
-
-      $('#reset_data_button').addEventListener('click', () => {
-        commit({ accounts: [] })
-        renderEverything()
-      })
-
-      newAccountForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const form = e.target
-        const data = new FormData(form)
-        const name = data.get("name") || "Account"
-        const initialValue = parseInt(data.get("initial_value")) || 0
-        const accountType = data.get("account_type")
-
-        const snapshot = getNetWorthSnapshot()
-        snapshot.accounts.push({ id: newID(), name, account_type: accountType, value: initialValue, history: [] })
-        commit(snapshot)
-        closeActiveModal()
-        renderEverything()
-        form.reset()
-      })
-
-      function closeActiveModal() {
-        activeModal.classList.remove('shown')
-        modalOverlay.classList.remove('shown')
-      }
-
-      modalOverlay.addEventListener('click', () => {
-        closeActiveModal()
-      })
-
-      function isLiability (account) {
-        return ['car_loan', 'student_loan', 'mortgage'].includes(account.account_type)
-      }
-
-      function accountEmoji(account) {
-        switch (account.account_type) {
-          case "savings": return '💰'
-          case "investments": return '📈'
-          case "property": return '🏠'
-          case "student_loan": return '🎓'
-          case "car_loan": return '🚗'
-          case "mortgage": return '🏠'
-          default: return '🏛️'
-        }
-      }
-
-      function accountValue(account) {
-        const factor = isLiability(account) && account.value > 0 ? -1 : +1
-        return (account.value * factor)
-      }
-
-      function renderTotal() {
-        const total = netWorthData.accounts.reduce((total, account) => {
-          return total + accountValue(account) 
-        }, 0)
-        const totalDisplay = $('#total')
-        totalDisplay.textContent = money(total ?? 0)
-      }
-
-      function renderEverything() {
-        renderTotal()
-        renderAccounts()
-      }
-
-      const formatter = new Intl.NumberFormat("en-US", { 
-        style: "currency", 
-        currency: "USD", 
-        maximumSignificantDigits: 4, 
-        notation: "compact", 
-      })
-
-      function money(int) {
-        return formatter.format(int)
-      }
-
-      function renderAccounts() {
-        const accountsUI = netWorthData.accounts.reduce((ui, account) => {
-          const accountUI = `
-            <div class="account" data-id="${account.id}">
-              <div class="icon" draggable="true">${accountEmoji(account)}</div>
-              <header>
-                <h1>${account.name}</h1>
-                <h2>${money(accountValue(account))}</h2>
-              </header>
-            </div>
-            `
-          return ui + accountUI
-        }, "")
-
-        $('#accounts').innerHTML = accountsUI
-      }
-
-      document.addEventListener('click', (event) => {
-        const accountElement = event.target.closest('.account')
-        if (accountElement) {
-          const accountId = accountElement.dataset.id
-          const account = netWorthData.accounts.find(a => a.id === accountId)
-          if (account) {
-            activeAccount = account
-            modalOverlay.classList.add('shown')
-
-            editAccountForm.classList.add('shown')
-            activeModal = editAccountForm
-            renderEditAccountForm()
-          }
-        }
-      })
-
-      function renderEditAccountForm() {
-        $('#account_name').textContent = activeAccount.name
-        $('#edit_account_form input[name="account_value"]').value = activeAccount.value
-        $('#delete_account').addEventListener('click', () => {
-          const snapshot = getNetWorthSnapshot()
-          snapshot.accounts = snapshot.accounts.filter(a => a.id !== activeAccount.id)
-          commit(snapshot)
-          closeActiveModal()
-          renderEverything()
-        })
-      }
-
-      function getNetWorthSnapshot() {
-        return JSON.parse(JSON.stringify(netWorthData))
-      }
-
-      editAccountForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (!activeAccount) {
-          return
-        }
-        const form = e.target
-        const data = new FormData(form)
-        const newValue = parseInt(data.get("account_value")) || 0
-
-        if (activeAccount.value === newValue) {
-          return
-        }
-
-        const snapshot = getNetWorthSnapshot()
-        const snapshotAccount = snapshot.accounts.find(a => a.id === activeAccount.id)
-        snapshotAccount.value = newValue
-        commit(snapshot)
-
-        closeActiveModal()
-        renderEverything()
-        form.reset()
-      })
-
-      function initialize() {
-        renderEverything()
-        console.log(JSON.stringify(netWorthData, null, 2))
-      }
-      initialize()
-
-    </script>
   </body>
 </html>
