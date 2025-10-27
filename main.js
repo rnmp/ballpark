@@ -115,14 +115,15 @@ function renderEverything() {
   renderToolbar()
 }
 
-function editableTitle(text, save) {
-  const title = make('h1')
+function editableTitle(text, save, opts = {}) {
+  const tag = opts.tag || 'h1'
+  const title = make(tag)
   title.textContent = text
 
   let editing = false
 
   const input = make('input')
-  input.value = text
+  input.value = opts.editText || text
   input.style.border = 'none'
 
   const complete = () => {
@@ -133,7 +134,8 @@ function editableTitle(text, save) {
     editing = false 
     title.innerHTML = input.value
 
-    if (input.value === text) {
+    if (input.value === (opts.editText || text)) {
+      title.innerHTML = text
       return 
     }
     save(input.value)
@@ -165,14 +167,6 @@ function renderAccount(account) {
   emoji.classList.add('icon')
   emoji.textContent = accountEmoji(account)
 
-  emoji.addEventListener('click', () => {
-    activeAccount = account
-    modalOverlay.classList.add('shown')
-    editAccountForm.classList.add('shown')
-    activeModal = editAccountForm
-    renderEditAccountForm()
-  })
-
   wrapper.appendChild(emoji)
 
   const header = make('header')
@@ -189,8 +183,20 @@ function renderAccount(account) {
   })
   header.appendChild(name)
 
-  const balance = make('h2')
-  balance.textContent = money(accountValue(account))
+  const balance = editableTitle(
+    money(accountValue(account)), 
+    (newBalance) => {
+      const snapshot = getSnapshot()
+      const snapshotAccount = snapshot.accounts.find(a => a.id === account.id)
+      snapshotAccount.value = newBalance
+      commit(snapshot)
+      renderEverything()
+    }, 
+    { 
+      tag: 'h2', 
+      editText: account.value 
+    }
+  )
   header.appendChild(balance)
 
   const options = make('div')
@@ -218,34 +224,6 @@ function renderAccounts() {
   $('#accounts').innerHTML = ''
   $('#accounts').append(...accountsUI)
 }
-
-function renderEditAccountForm() {
-  $('#account_name').textContent = activeAccount.name
-  $('#edit_account_form input[name="account_value"]').value = activeAccount.value
-}
-
-editAccountForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  if (!activeAccount) {
-    return
-  }
-  const form = e.target
-  const data = new FormData(form)
-  const newValue = parseInt(data.get("account_value")) || 0
-
-  if (activeAccount.value === newValue) {
-    return
-  }
-
-  const snapshot = getSnapshot()
-  const snapshotAccount = snapshot.accounts.find(a => a.id === activeAccount.id)
-  snapshotAccount.value = newValue
-  commit(snapshot)
-
-  closeActiveModal()
-  renderEverything()
-  form.reset()
-})
 
 function initialize() {
   renderEverything()
