@@ -1,0 +1,40 @@
+{
+  "accounts": [
+    {
+      "name": "Student Loan",
+      "account_type": "student_loan",
+      "value": 68200,
+      "history": []
+    },
+    {
+      "name": "401K",
+      "account_type": "investments",
+      "value": 30000,
+      "history": []
+    },
+    {
+      "name": "Emergency Fund",
+      "account_type": "savings",
+      "value": 40000,
+      "history": []
+    },
+    {
+      "name": "Mortgage",
+      "account_type": "mortgage",
+      "value": 320000,
+      "history": []
+    },
+    {
+      "name": "Car Loan",
+      "account_type": "car_loan",
+      "value": 12390,
+      "history": []
+    },
+    {
+      "name": "House",
+      "account_type": "property",
+      "value": 400000,
+      "history": []
+    }
+  ]
+}

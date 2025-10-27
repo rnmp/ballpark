@@ -1,4 +1,9 @@
-let netWorthData = { accounts: [] }
+import INITIAL_DATA from './initial-data.json' with { type: 'json' }
+
+const initialData = INITIAL_DATA
+initialData.accounts = initialData.accounts.map(a => ({ ...a, id: crypto.randomUUID() }))
+
+let netWorthData = initialData
 try {
   const parsedNetWorthData = JSON.parse(localStorage.getItem('netWorth'))
   if (parsedNetWorthData) {

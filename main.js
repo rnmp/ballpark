@@ -190,6 +190,9 @@ function renderAccount(account) {
       const snapshotAccount = snapshot.accounts.find(a => a.id === account.id)
       snapshotAccount.value = newBalance
       commit(snapshot)
+
+      // TODO: should only need to re-render total but 
+      // right now the formatting is not being applied
       renderEverything()
     }, 
     { 
