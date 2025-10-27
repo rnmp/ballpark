@@ -135,7 +135,7 @@ main {
 .account {
   display: flex;
   gap: 1rem;
-  border-top: 0.5px dashed var(--text-color);
+  border-top: 0.5px solid var(--text-color);
   padding: 0.85rem 1.5rem;
 }
 .account h1 {
