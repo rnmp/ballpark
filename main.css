@@ -118,6 +118,26 @@ main {
   display: flex;
 }
 
+.spacer, .flex-1 {
+  flex: 1;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.items-end {
+  align-items: flex-end;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
 .modal {
   background: var(--background-color);
   width: 400px;
@@ -186,9 +206,6 @@ input.form, textarea {
   background: var(--input-color);
 }
 
-.spacer {
-  flex: 1;
-}
 
 #temp_action {
   display: flex;

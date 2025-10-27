@@ -1,6 +1,6 @@
+import { isLiability, accountEmoji, accountValue, money } from './accounts.js'
 import { commit, getSnapshot, undo, redo, getHistoryCounts } from './data.js'
 import { $, make } from './dom.js'
-import { isLiability, accountEmoji, accountValue, money } from './accounts.js'
 
 const modalOverlay = $('#modal_overlay')
 const newAccountForm = $('#new_account_form')
@@ -193,6 +193,19 @@ function renderAccount(account) {
   balance.textContent = money(accountValue(account))
   header.appendChild(balance)
 
+  const options = make('div')
+  options.className = 'flex flex-1 justify-end items-end'
+  wrapper.appendChild(options)
+  const deleteButton = make('button')
+  deleteButton.textContent = 'Delete'
+  deleteButton.addEventListener('click', () => {
+    const snapshot = getSnapshot()
+    snapshot.accounts = snapshot.accounts.filter(a => a.id !== account.id)
+    commit(snapshot)
+    renderEverything()
+  })
+  options.appendChild(deleteButton)
+
   return wrapper
 }
 
@@ -209,13 +222,6 @@ function renderAccounts() {
 function renderEditAccountForm() {
   $('#account_name').textContent = activeAccount.name
   $('#edit_account_form input[name="account_value"]').value = activeAccount.value
-  $('#delete_account').addEventListener('click', () => {
-    const snapshot = getSnapshot()
-    snapshot.accounts = snapshot.accounts.filter(a => a.id !== activeAccount.id)
-    commit(snapshot)
-    closeActiveModal()
-    renderEverything()
-  })
 }
 
 editAccountForm.addEventListener('submit', (e) => {
