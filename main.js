@@ -131,8 +131,11 @@ function editableTitle(text, save) {
     }
 
     editing = false 
-
     title.innerHTML = input.value
+
+    if (input.value === text) {
+      return 
+    }
     save(input.value)
   }
   
@@ -194,8 +197,10 @@ function renderAccount(account) {
 }
 
 function renderAccounts() {
-
-  const accountsUI = getSnapshot().accounts.map(renderAccount)
+  const accountsUI = getSnapshot()
+    .accounts
+    .sort((a, b) => accountValue(b) - accountValue(a))
+    .map(renderAccount)
 
   $('#accounts').innerHTML = ''
   $('#accounts').append(...accountsUI)
