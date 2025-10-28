@@ -14,35 +14,39 @@
         <h1>BALLPARK</h1>
         <h2 id="total">$0</h2>
         <div id="temp_action">
-          <button id="new_account">+ Account</button>
-          <button id="settings_button">Settings</button>
-          <div class="spacer"></div>
-          <button id="undo">Undo</button>
-          <button id="redo">Redo</button>
+          <button id="new_account" class="font-sm">+ Account</button>
+          <button id="settings_button" class="font-sm">Settings</button>
+          <div class="flex-1"></div>
+          <button id="undo" class="font-sm">Undo</button>
+          <button id="redo" class="font-sm">Redo</button>
         </div>
       </header>
       <div id="accounts"></div>
       <div id="modal_overlay"></div>
       <form id="new_account_form" class="modal">
-        <h1>Add Account</h1>
-        <div class="flex">
-          <input type="text" name="name" placeholder="Name" autocomplete="off" />
-          <select name="account_type">
-            <option value="savings">Savings</option>
-            <option value="investments">Investments</option>
-            <option value="property">Property</option>
-            <option value="student_loan">Student Loan</option>
-            <option value="car_loan">Car Loan</option>
-            <option value="mortgage">Mortgate</option>
-          </select>
+        <h1 class="font-xl mb-5">New Account</h1>
+        <div class="button mb-5">
+          <div class="input-pair py-1">
+            <label for="new_account_name" class="font-sm">Name</label>
+            <input type="text" id="new_account_name" name="name" placeholder="Emergency Fund" autocomplete="off" />
+          </div>
+          <div class="input-pair py-1">
+            <label for="new_account_value" class="font-sm">Balance</label>
+            <input type="text" id="new_account_value" name="initial_value" placeholder="$30,000" />
+          </div>
         </div>
-        <input type="number" name="initial_value" placeholder="Value" />
 
-        <button type="submit">Create Account</button>
+        <h1 class="mb-3">Account Type</h1>
+        <h2 class="font-sm mb-2 font-semibold">Assets</h2>
+        <div id="asset_options" class="account-type-options mb-4"></div>
+        <h2 class="font-sm mb-2 font-semibold">Liabilities</h2>
+        <div id="liability_options" class="account-type-options mb-6"></div>
+
+        <button type="submit">Save</button>
       </form>
 
       <div id="settings" class="modal">
-        <h1 class="modal-title">Settings</h1>
+        <h1 class="font-xl mb-5">Settings</h1>
 
         <div class="button-bar">
           <input type="file" id="import_data_file_picker" accept=".json" style="display: none;" />

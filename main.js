@@ -1,4 +1,5 @@
-import { isLiability, accountEmoji, accountValue, money } from './accounts.js'
+import { accountEmoji, accountValue, getAccountDisplays } from './accounts.js'
+import { money, sanitizeMoneyInput } from './money.js'
 import { commit, getSnapshot, undo, redo, getHistoryCounts } from './data.js'
 import { $, make } from './dom.js'
 
@@ -21,8 +22,41 @@ $('#redo').addEventListener('click', () => {
 $('#new_account').addEventListener('click',  () => {
   modalOverlay.classList.add('shown')
   newAccountForm.classList.add('shown')
+  newAccountForm.querySelector('input[name="name"]').focus()
+  newAccountForm.querySelector('input[value="savings"]').checked = true
   activeModal = newAccountForm
 })
+
+function populateAccountTypeSelector() {
+  const { assets, liabilities } = getAccountDisplays()
+
+  const assetOptions = $('#asset_options')
+  for (const assetType of assets) {
+    assetOptions.append(makeOption(assetType))
+  }
+
+  const liabilityOptions = $('#liability_options')
+  for (const liabilityType of liabilities) {
+    liabilityOptions.append(makeOption(liabilityType))
+  }
+
+  function makeOption ({ accountType, label, emoji }) {
+    const optionId = `account_type:${accountType}`
+    const optionLabel = make('label')
+    optionLabel.className = 'account-type-option button font-sm'
+    optionLabel.htmlFor = optionId
+    optionLabel.textContent = `${emoji} ${label}`
+
+    const option = make('input')
+    option.id = optionId
+    option.setAttribute('type', 'radio')
+    option.setAttribute('name', 'account_type')
+    option.value = accountType
+    optionLabel.append(option)
+
+    return optionLabel
+  }
+}
 
 $('#settings_button').addEventListener('click', () => {
   modalOverlay.classList.add('shown')
@@ -75,7 +109,7 @@ newAccountForm.addEventListener('submit', (e) => {
   const form = e.target
   const data = new FormData(form)
   const name = data.get("name") || "Account"
-  const initialValue = parseInt(data.get("initial_value")) || 0
+  const initialValue = sanitizeMoneyInput(data.get("initial_value"))
   const accountType = data.get("account_type")
 
   const snapshot = getSnapshot()
@@ -165,7 +199,7 @@ function renderAccount(account) {
 
   const emoji = make('div')
   emoji.classList.add('icon')
-  emoji.textContent = accountEmoji(account)
+  emoji.textContent = accountEmoji(account.account_type)
 
   wrapper.appendChild(emoji)
 
@@ -188,7 +222,7 @@ function renderAccount(account) {
     (newBalance) => {
       const snapshot = getSnapshot()
       const snapshotAccount = snapshot.accounts.find(a => a.id === account.id)
-      snapshotAccount.value = newBalance
+      snapshotAccount.value = sanitizeMoneyInput(newBalance)
       commit(snapshot)
 
       // TODO: should only need to re-render total but 
@@ -206,6 +240,7 @@ function renderAccount(account) {
   options.className = 'flex flex-1 justify-end items-end'
   wrapper.appendChild(options)
   const deleteButton = make('button')
+  deleteButton.className = 'font-sm'
   deleteButton.textContent = 'Delete'
   deleteButton.addEventListener('click', () => {
     const snapshot = getSnapshot()
@@ -229,7 +264,7 @@ function renderAccounts() {
 }
 
 function initialize() {
+  populateAccountTypeSelector()
   renderEverything()
-  console.log(JSON.stringify(getSnapshot(), null, 2))
 }
 initialize()
