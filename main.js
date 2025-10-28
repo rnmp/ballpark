@@ -23,6 +23,7 @@ $('#new_account').addEventListener('click',  () => {
   modalOverlay.classList.add('shown')
   newAccountForm.classList.add('shown')
   newAccountForm.querySelector('input[name="name"]').focus()
+  newAccountForm.querySelector('input[name="initial_value"]').setAttribute('placeholder', money(30000))
   newAccountForm.querySelector('input[value="savings"]').checked = true
   activeModal = newAccountForm
 })
