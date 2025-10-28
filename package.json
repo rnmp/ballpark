@@ -1,5 +1,8 @@
 {
-  "dependencies": {
+  "name": "ballpark",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
     "browser-sync": "^3.0.4"
   }
 }
