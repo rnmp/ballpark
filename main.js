@@ -63,6 +63,17 @@ $('#settings_button').addEventListener('click', () => {
   const settingsModal = $('#settings')
   settingsModal.classList.add('shown')
   activeModal = settingsModal
+
+  // Set currency selector to current value
+  const snapshot = getSnapshot()
+  $('#currency_selector').value = snapshot.currency || 'USD'
+})
+
+$('#currency_selector').addEventListener('change', (e) => {
+  const snapshot = getSnapshot()
+  snapshot.currency = e.target.value
+  commit(snapshot)
+  renderEverything()
 })
 
 $('#import_data').addEventListener('click', () => {
@@ -129,11 +140,10 @@ modalOverlay.addEventListener('click', () => {
   closeActiveModal()
 })
 function renderTotal() {
-  const total = getSnapshot().accounts.reduce((total, account) => {
-    return total + accountValue(account) 
-  }, 0)
-  const totalDisplay = $('#total')
-  totalDisplay.textContent = money(total ?? 0, 'total')
+  const total = getSnapshot()
+    .accounts
+    .reduce((total, account) => total + accountValue(account), 0)
+  $('#total').textContent = money(total, 'total')
 }
 
 function renderToolbar() {
@@ -218,7 +228,7 @@ function renderAccount(account) {
   header.appendChild(name)
 
   const balance = editableTitle(
-    money(accountValue(account)), 
+    money(accountValue(account)),
     (newBalance) => {
       const snapshot = getSnapshot()
       const snapshotAccount = snapshot.accounts.find(a => a.id === account.id)
@@ -228,13 +238,13 @@ function renderAccount(account) {
         commit(snapshot)
       }
 
-      // TODO: should only need to re-render total but 
+      // TODO: should only need to re-render total but
       // right now the formatting is not being applied
       renderEverything()
-    }, 
-    { 
-      tag: 'h2', 
-      editText: account.value 
+    },
+    {
+      tag: 'h2',
+      editText: account.value
     }
   )
   header.appendChild(balance)

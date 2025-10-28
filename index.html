@@ -48,6 +48,25 @@
       <div id="settings" class="modal">
         <h1 class="font-xl mb-5">Settings</h1>
 
+        <div class="button mb-5">
+          <div class="input-pair py-1">
+            <label for="currency_selector" class="font-sm">Currency</label>
+            <select id="currency_selector" name="currency">
+              <option value="USD">USD - US Dollar</option>
+              <option value="EUR">EUR - Euro</option>
+              <option value="GBP">GBP - British Pound</option>
+              <option value="JPY">JPY - Japanese Yen</option>
+              <option value="CAD">CAD - Canadian Dollar</option>
+              <option value="AUD">AUD - Australian Dollar</option>
+              <option value="CHF">CHF - Swiss Franc</option>
+              <option value="CNY">CNY - Chinese Yuan</option>
+              <option value="INR">INR - Indian Rupee</option>
+              <option value="MXN">MXN - Mexican Peso</option>
+              <option value="PEN">PEN - Peruvian Sol</option>
+            </select>
+          </div>
+        </div>
+
         <div class="button-bar">
           <input type="file" id="import_data_file_picker" accept=".json" style="display: none;" />
           <button type="button" id="import_data">Import</button>

@@ -17,6 +17,10 @@ export function getSnapshot() {
   return JSON.parse(JSON.stringify(netWorthData))
 }
 
+export function getCurrency() {
+  return netWorthData.currency || 'USD'
+}
+
 let undos = []
 let redos = []
 
