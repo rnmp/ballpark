@@ -157,10 +157,7 @@ main {
 #modal_overlay {
   display: none;
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   background: var(--background-color);
   opacity: 0.8;
 }
