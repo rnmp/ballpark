@@ -1,11 +1,10 @@
 import { accountEmoji, accountValue, getAccountDisplays } from './accounts.js'
 import { money, sanitizeMoneyInput } from './money.js'
-import { commit, getSnapshot, undo, redo, getHistoryCounts } from './data.js'
+import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts } from './data.js'
 import { $, make } from './dom.js'
 
 const modalOverlay = $('#modal_overlay')
 const newAccountForm = $('#new_account_form')
-const editAccountForm = $('#edit_account_form')
 let activeModal = undefined;
 let activeAccount = undefined;
 
@@ -120,13 +119,13 @@ newAccountForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const form = e.target
   const data = new FormData(form)
-  const name = data.get("name") || "Account"
-  const initialValue = sanitizeMoneyInput(data.get("initial_value"))
-  const accountType = data.get("account_type")
 
-  const snapshot = getSnapshot()
-  snapshot.accounts.push({ id: crypto.randomUUID(), name, account_type: accountType, value: initialValue, history: [] })
-  commit(snapshot)
+  createAccount({ 
+    name: data.get("name") || "Account", 
+    accountType: data.get("account_type"), 
+    balance: sanitizeMoneyInput(data.get("initial_value")) 
+  })
+
   closeActiveModal()
   renderEverything()
   form.reset()
@@ -231,12 +230,9 @@ function renderAccount(account) {
   const balance = editableTitle(
     money(accountValue(account)),
     (newBalance) => {
-      const snapshot = getSnapshot()
-      const snapshotAccount = snapshot.accounts.find(a => a.id === account.id)
-      snapshotAccount.value = sanitizeMoneyInput(newBalance)
-
-      if (account.value !== snapshotAccount.value) {
-        commit(snapshot)
+      const nextValue = sanitizeMoneyInput(newBalance)
+      if (account.value !== nextValue) {
+        updateBalance({ balance: nextValue, accountId: account.id })
       }
 
       // TODO: should only need to re-render total but

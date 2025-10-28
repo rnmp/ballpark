@@ -226,9 +226,6 @@ main {
 #new_account_form.shown {
   display: block;
 }
-#edit_account_form.shown {
-  display: block;
-}
 #settings.shown {
   display: block;
 }
