@@ -45,9 +45,26 @@ const account4 = [
 
 // Given delta(a, b)
 // Calculate `a`:
-// const a = endPeriod(account3) + endPeriod(account4) // 600
+// const a = periodEnd(account3) + periodEnd(account4) // 600
 // Calculate `b`:
-// const b = startPeriod(account3) + startPeriod(account4) // 100 + 150 = 250
+// const b = periodStart(account3) + periodStart(account4) // 100 + 150 = 250
+
+// `periodStart` will look at the earliest available data point in current period.
+// Assumes datapoints are sorted in ascending order (by date)
+//
+// Fallback (in order):
+// - Most immediately available (to the left)
+// - Last available datapoint in current period (in practice, itself)
+// - 0
+
+// `periodEnd` will look at the latest available data point in current period.
+// Assumes datapoints are sorted in ascending order (by date)
+//
+// Fallback (in order):
+// - Last available datapoint in current period (in practice, itself)
+// - Most immediately available (to the right)
+// - 0
+
 
 const aggregate = {
   value: 600 - 250,
