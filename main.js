@@ -223,7 +223,10 @@ function renderAccount(account) {
       const snapshot = getSnapshot()
       const snapshotAccount = snapshot.accounts.find(a => a.id === account.id)
       snapshotAccount.value = sanitizeMoneyInput(newBalance)
-      commit(snapshot)
+
+      if (account.value !== snapshotAccount.value) {
+        commit(snapshot)
+      }
 
       // TODO: should only need to re-render total but 
       // right now the formatting is not being applied
