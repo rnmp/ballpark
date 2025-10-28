@@ -60,6 +60,14 @@ input, button, select, textarea {
   padding: 0.25em 0.65em;
 }
 
+.button {
+  transition: scale 0.1s ease-in-out;
+}
+
+.button:active {
+  scale: 0.95;
+}
+
 .input-pair {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
