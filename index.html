@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="main.css" />
   </head>
   <body>
@@ -14,11 +14,11 @@
         <h1>BALLPARK</h1>
         <h2 id="total">$0</h2>
         <div id="temp_action">
-          <button id="new_account" class="font-sm">+ Account</button>
-          <button id="settings_button" class="font-sm">Settings</button>
+          <button id="new_account" class="button font-sm">+ Account</button>
+          <button id="settings_button" class="button font-sm">Settings</button>
           <div class="flex-1"></div>
-          <button id="undo" class="font-sm">Undo</button>
-          <button id="redo" class="font-sm">Redo</button>
+          <button id="undo" class="button font-sm">Undo</button>
+          <button id="redo" class="button font-sm">Redo</button>
         </div>
       </header>
       <div id="accounts"></div>
@@ -42,7 +42,7 @@
         <h2 class="font-sm mb-2 font-semibold">Liabilities</h2>
         <div id="liability_options" class="account-type-options mb-6"></div>
 
-        <button type="submit">Save</button>
+        <button type="submit" class="button">Save</button>
       </form>
 
       <div id="settings" class="modal">
@@ -69,9 +69,9 @@
 
         <div class="button-bar">
           <input type="file" id="import_data_file_picker" accept=".json" style="display: none;" />
-          <button type="button" id="import_data">Import</button>
-          <button type="button" id="export_data">Export</button>
-          <button type="button" id="reset_data_button">Reset</button>
+          <button type="button" class="button" id="import_data">Import</button>
+          <button type="button" class="button" id="export_data">Export</button>
+          <button type="button" class="button" id="reset_data_button">Reset</button>
         </div>
       </div>
     </main>

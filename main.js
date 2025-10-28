@@ -211,10 +211,10 @@ function renderAccount(account) {
   emoji.classList.add('icon')
   emoji.textContent = accountEmoji(account.account_type)
 
-  wrapper.appendChild(emoji)
+  wrapper.append(emoji)
 
   const header = make('header')
-  wrapper.appendChild(header)
+  wrapper.append(header)
 
   const name = editableTitle(account.name, (newName) => {
     const snapshot = getSnapshot()
@@ -225,7 +225,7 @@ function renderAccount(account) {
     // We don't need to render everything
     renderToolbar()
   })
-  header.appendChild(name)
+  header.append(name)
 
   const balance = editableTitle(
     money(accountValue(account)),
@@ -244,13 +244,13 @@ function renderAccount(account) {
       editText: account.value
     }
   )
-  header.appendChild(balance)
+  header.append(balance)
 
   const options = make('div')
   options.className = 'flex flex-1 justify-end items-end'
-  wrapper.appendChild(options)
+  wrapper.append(options)
   const deleteButton = make('button')
-  deleteButton.className = 'font-sm'
+  deleteButton.className = 'button font-sm'
   deleteButton.textContent = 'Delete'
   deleteButton.addEventListener('click', () => {
     const snapshot = getSnapshot()
@@ -258,7 +258,7 @@ function renderAccount(account) {
     commit(snapshot)
     renderEverything()
   })
-  options.appendChild(deleteButton)
+  options.append(deleteButton)
 
   return wrapper
 }

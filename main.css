@@ -69,11 +69,7 @@ input, select {
   color: unset;
 }
 
-button, .button {
-  display: block;
-  font: inherit;
-  appearance: none;
-  -webkit-appearance: none;
+.button {
   border-radius: 0.35em;
   border: 0.5px solid var(--text-color);
   border-bottom-width: 1.5px;
