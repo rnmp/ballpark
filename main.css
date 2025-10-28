@@ -136,6 +136,10 @@ main {
   border-right-width: 1px;
   border-radius: 0.85rem;
   overflow: scroll;
+  transition: scale 0.2s ease-in-out;
+}
+main.suspended {
+  scale: 0.98;
 }
 
 .account {
@@ -178,22 +182,49 @@ main {
   display: none;
 }
 
+@keyframes fade-in {
+  from {
+    opacity: 0%;
+  }
+
+  to {
+    opacity: 80%;
+  }
+}
+
+@keyframes modal-slide-up {
+  from {
+    opacity: 0%;
+    transform: scale(0.9) translateX(-50%) translateY(-40%);
+  }
+
+  to {
+    opacity: 100%;
+    transform: scale(1) translateX(-50%) translateY(-50%);
+  }
+}
+
 .modal {
   background: var(--background-color);
   width: 400px;
   position: fixed;
   top: 50%;
   left: 50%;
-  padding: 20px;
+  padding: 24px 28px 28px;
+  transform-origin: 0 0;
   transform: translateX(-50%) translateY(-50%);
   border: 0.5px solid var(--text-color);
   border-bottom-width: 1.5px;
   border-right-width: 1px;
   border-radius: 0.85rem;
+  animation-name: modal-slide-up;
+  animation-duration: 0.2s;
 }
 
 #modal_overlay.shown {
   display: block;
+  animation-name: fade-in;
+  animation-duration: 0.2s;
 }
 #new_account_form.shown {
   display: block;

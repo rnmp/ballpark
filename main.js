@@ -25,6 +25,7 @@ $('#new_account').addEventListener('click',  () => {
   newAccountForm.querySelector('input[name="initial_value"]').setAttribute('placeholder', money(30000))
   newAccountForm.querySelector('input[value="savings"]').checked = true
   activeModal = newAccountForm
+  $('main').classList.add('suspended')
 })
 
 function populateAccountTypeSelector() {
@@ -63,6 +64,7 @@ $('#settings_button').addEventListener('click', () => {
   const settingsModal = $('#settings')
   settingsModal.classList.add('shown')
   activeModal = settingsModal
+  $('main').classList.add('suspended')
 
   // Set currency selector to current value
   const snapshot = getSnapshot()
@@ -132,6 +134,7 @@ newAccountForm.addEventListener('submit', (e) => {
 })
 
 function closeActiveModal() {
+  $('main').classList.remove('suspended')
   activeModal.classList.remove('shown')
   modalOverlay.classList.remove('shown')
 }

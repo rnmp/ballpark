@@ -6,7 +6,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="main.css" />
+    <link rel="stylesheet" href="./main.css" />
   </head>
   <body>
     <main>
@@ -22,59 +22,58 @@
         </div>
       </header>
       <div id="accounts"></div>
-      <div id="modal_overlay"></div>
-      <form id="new_account_form" class="modal">
-        <h1 class="font-xl mb-5">New Account</h1>
-        <div class="button mb-5">
-          <div class="input-pair py-1">
-            <label for="new_account_name" class="font-sm">Name</label>
-            <input type="text" id="new_account_name" name="name" placeholder="Emergency Fund" autocomplete="off" />
-          </div>
-          <div class="input-pair py-1">
-            <label for="new_account_value" class="font-sm">Balance</label>
-            <input type="text" id="new_account_value" name="initial_value" placeholder="$30,000" />
-          </div>
+    </main>
+    <div id="modal_overlay"></div>
+    <form id="new_account_form" class="modal">
+      <h1 class="font-xl mb-5">New Account</h1>
+      <div class="button mb-5">
+        <div class="input-pair py-1">
+          <label for="new_account_name" class="font-sm">Name</label>
+          <input type="text" id="new_account_name" name="name" placeholder="Emergency Fund" autocomplete="off" />
         </div>
-
-        <h1 class="mb-3">Account Type</h1>
-        <h2 class="font-sm mb-2 font-semibold">Assets</h2>
-        <div id="asset_options" class="account-type-options mb-4"></div>
-        <h2 class="font-sm mb-2 font-semibold">Liabilities</h2>
-        <div id="liability_options" class="account-type-options mb-6"></div>
-
-        <button type="submit" class="button">Save</button>
-      </form>
-
-      <div id="settings" class="modal">
-        <h1 class="font-xl mb-5">Settings</h1>
-
-        <div class="button mb-5">
-          <div class="input-pair py-1">
-            <label for="currency_selector" class="font-sm">Currency</label>
-            <select id="currency_selector" name="currency">
-              <option value="USD">USD - US Dollar</option>
-              <option value="EUR">EUR - Euro</option>
-              <option value="GBP">GBP - British Pound</option>
-              <option value="JPY">JPY - Japanese Yen</option>
-              <option value="CAD">CAD - Canadian Dollar</option>
-              <option value="AUD">AUD - Australian Dollar</option>
-              <option value="CHF">CHF - Swiss Franc</option>
-              <option value="CNY">CNY - Chinese Yuan</option>
-              <option value="INR">INR - Indian Rupee</option>
-              <option value="MXN">MXN - Mexican Peso</option>
-              <option value="PEN">PEN - Peruvian Sol</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="flex gap-2">
-          <input type="file" id="import_data_file_picker" accept=".json" style="display: none;" />
-          <button type="button" class="button" id="import_data">Import</button>
-          <button type="button" class="button" id="export_data">Export</button>
-          <button type="button" class="button" id="reset_data_button">Reset</button>
+        <div class="input-pair py-1">
+          <label for="new_account_value" class="font-sm">Balance</label>
+          <input type="text" id="new_account_value" name="initial_value" placeholder="$30,000" />
         </div>
       </div>
-    </main>
+
+      <h1 class="mb-3">Account Type</h1>
+      <h2 class="font-sm mb-2 font-semibold">Assets</h2>
+      <div id="asset_options" class="account-type-options mb-4"></div>
+      <h2 class="font-sm mb-2 font-semibold">Liabilities</h2>
+      <div id="liability_options" class="account-type-options mb-6"></div>
+
+      <button type="submit" class="button">Save</button>
+    </form>
+    <div id="settings" class="modal">
+      <h1 class="font-xl mb-5">Settings</h1>
+
+      <div class="button mb-5">
+        <div class="input-pair py-1">
+          <label for="currency_selector" class="font-sm">Currency</label>
+          <select id="currency_selector" name="currency">
+            <option value="USD">USD - US Dollar</option>
+            <option value="EUR">EUR - Euro</option>
+            <option value="GBP">GBP - British Pound</option>
+            <option value="JPY">JPY - Japanese Yen</option>
+            <option value="CAD">CAD - Canadian Dollar</option>
+            <option value="AUD">AUD - Australian Dollar</option>
+            <option value="CHF">CHF - Swiss Franc</option>
+            <option value="CNY">CNY - Chinese Yuan</option>
+            <option value="INR">INR - Indian Rupee</option>
+            <option value="MXN">MXN - Mexican Peso</option>
+            <option value="PEN">PEN - Peruvian Sol</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <input type="file" id="import_data_file_picker" accept=".json" style="display: none;" />
+        <button type="button" class="button" id="import_data">Import</button>
+        <button type="button" class="button" id="export_data">Export</button>
+        <button type="button" class="button" id="reset_data_button">Reset</button>
+      </div>
+    </div>
     <script type="module" src="./main.js"></script>
   </body>
 </html>
