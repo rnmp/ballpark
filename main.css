@@ -219,11 +219,6 @@ main {
   border-color: var(--text-color)
 }
 
-.button-bar {
-  display: flex;
-  gap: 0.5rem;
-}
-
 .account-type-options {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
