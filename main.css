@@ -142,6 +142,9 @@ input, button, select, textarea {
 
 .p-6 { padding: 1.5rem; }
 
+.tracking-wide { letter-spacing: 0.25em; }
+.uppercase     { text-transform: uppercase; }
+
 main {
   flex: 1;
   border: 0.5px solid var(--text-color);
