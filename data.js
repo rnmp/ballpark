@@ -47,6 +47,10 @@ export function commit(newData, opts = {}) {
 
 }
 
+export function resetData() {
+  commit(initialData)
+}
+
 export function produceHistory(value) {
   return {
     timestamp: new Date().toISOString(),

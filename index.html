@@ -10,18 +10,34 @@
   </head>
   <body>
     <main>
-      <header class="p-6">
-        <h1 class="mb-1 font-extrabold">BALLPARK</h1>
-        <h2 id="total" class="mb-4 font-3xl">$0</h2>
-        <div class="flex gap-2">
-          <button id="new_account" class="button font-sm">+ Account</button>
-          <button id="settings_button" class="button font-sm">Settings</button>
-          <div class="flex-1"></div>
-          <button id="undo" class="button font-sm">Undo</button>
-          <button id="redo" class="button font-sm">Redo</button>
+      <header class="p-6 flex gap-2 items-end">
+        <div>
+          <h1 class="mb-1 font-extrabold">BALLPARK</h1>
+          <h2 id="total" class="font-3xl">$0</h2>
         </div>
+        <div class="flex-1"></div>
+        <button id="undo" class="button flex">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M7.49049 13.0022C6.12748 11.6392 5.36301 10.8745 4 9.51145C5.36301 8.14844 6.12748 7.38449 7.49049 6.02148" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 9.51099H15.7664C18.1046 9.51099 19.9997 11.4061 19.9997 13.7443C19.9997 16.0826 18.1046 17.9784 15.7664 17.9784H12.2824" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button id="redo" class="button flex">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M7.49049 13.0022C6.12748 11.6392 5.36301 10.8745 4 9.51145C5.36301 8.14844 6.12748 7.38449 7.49049 6.02148" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 9.51099H15.7664C18.1046 9.51099 19.9997 11.4061 19.9997 13.7443C19.9997 16.0826 18.1046 17.9784 15.7664 17.9784H12.2824" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </header>
       <div id="accounts"></div>
+      <button id="new_account" class="account w-full gap-5">
+        <div class="icon font-2xl font-light">+</div>
+        <p class="ml-1">New Account</p>
+      </button>
+      <div class="flex-1"></div>
+      <div class="flex justify-end p-6">
+          <button id="settings_button" class="button font-sm">Settings</button>
+      </div>
     </main>
     <div id="modal_overlay"></div>
     <form id="new_account_form" class="modal">

@@ -13,4 +13,4 @@ The simplest net worth tracker imaginable, built on web tech and zero dependenci
 
 All business logic takes place in `main.js`, though running index.html on a browser should 
 be enough to preview changes. If you want to auto-reload your changes, feel free to install 
-the package.json dependencies and run `node watch.js`.
+the package.json dependencies and run `node watch.cjs`.

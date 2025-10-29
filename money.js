@@ -17,7 +17,7 @@ export function money(int, mode) {
     maximumFractionDigits: 0,
   });
 
-  const netWorth = new Intl.NumberFormat(language, {
+  const compact = new Intl.NumberFormat(language, {
     style: "currency",
     currency,
     maximumSignificantDigits: 3,
@@ -26,8 +26,8 @@ export function money(int, mode) {
 
   let value = account.format(int) 
 
-  if (mode === 'total') {
-    value = netWorth.format(int)
+  if (mode === 'compact') {
+    value = compact.format(int)
   }
 
   if (currency === 'PEN') {

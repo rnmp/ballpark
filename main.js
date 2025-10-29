@@ -1,6 +1,6 @@
 import { accountEmoji, accountValue, getAccountDisplays } from './accounts.js'
 import { money, sanitizeMoneyInput } from './money.js'
-import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts } from './data.js'
+import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData } from './data.js'
 import { $, make } from './dom.js'
 
 const modalOverlay = $('#modal_overlay')
@@ -113,7 +113,7 @@ $('#export_data').addEventListener('click', () => {
 })
 
 $('#reset_data_button').addEventListener('click', () => {
-  commit({ accounts: [] })
+  resetData()
   renderEverything()
 })
 
@@ -146,14 +146,14 @@ function renderTotal() {
   const total = getSnapshot()
     .accounts
     .reduce((total, account) => total + accountValue(account), 0)
-  $('#total').textContent = money(total, 'total')
+  $('#total').textContent = money(total)
 }
 
 function renderToolbar() {
   const { undos, redos } = getHistoryCounts()
 
-  $('#undo').classList.toggle('shown', Boolean(undos))
-  $('#redo').classList.toggle('shown', Boolean(redos))
+  $('#undo').disabled = !Boolean(undos)
+  $('#redo').disabled = !Boolean(redos)
 }
 
 function renderEverything() {
