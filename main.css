@@ -267,23 +267,20 @@ main.suspended {
   opacity: 0.5
 }
 
-.editable-text:not(:has(input)), .editable-text input {
+.editable-text input {
   border: 0.5px solid transparent;
   border-radius: 4px;
   padding: 2px 4px;
   width: 200px;
 }
 
-.editable-text:not(:has(input)):hover {
+.editable-text input:hover,
+.editable-text input:focus {
   border-color: var(--text-color)
 }
 
 .editable-text input {
   outline: none;
-}
-
-.editable-text input:focus {
-  border-color: var(--text-color)
 }
 
 .account-type-options {
