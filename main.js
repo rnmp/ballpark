@@ -2,6 +2,7 @@ import { accountEmoji, accountValue, getAccountDisplays } from './accounts.js'
 import { money, sanitizeMoneyInput } from './money.js'
 import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData } from './data.js'
 import { $, make } from './dom.js'
+import { editableText } from './components.js'
 
 const modalOverlay = $('#modal_overlay')
 const newAccountForm = $('#new_account_form')
@@ -162,75 +163,44 @@ function renderEverything() {
   renderToolbar()
 }
 
-function editableTitle(text, save, opts = {}) {
-  const tag = opts.tag || 'h1'
-  const title = make(tag)
-  title.className = 'editable-text'
-  title.textContent = text
-
-  let editing = false
-
-  const input = make('input')
-  input.value = opts.editText || text
-
-  const complete = () => {
-    if (!editing) {
-      return
-    }
-
-    editing = false 
-    title.innerHTML = input.value
-
-    if (input.value === (opts.editText || text)) {
-      title.innerHTML = text
-      return 
-    }
-    save(input.value)
-  }
-  
-  input.addEventListener('blur', complete)
-
-  document.addEventListener('click', complete)
-
-  title.addEventListener('click', (event) => {
-    event.stopPropagation()
-
-    editing = true
-
-    title.innerHTML = ''
-    title.append(input)
-    input.focus()
-  })
-
-  return title
-}
 
 function renderAccount(account) {
   const wrapper = make('div')
-  wrapper.classList.add('account')
-  wrapper.dataset.id = account.id
+  wrapper.className = 'flex gap-3 items-center pl-6 border-t-0.5'
 
   const emoji = make('div')
-  emoji.classList.add('icon')
+  emoji.className = 'button p-0 size-10 flex items-center justify-center rounded-full'
   emoji.textContent = accountEmoji(account.account_type)
 
   wrapper.append(emoji)
 
   const header = make('header')
+  header.className = 'py-3'
   wrapper.append(header)
 
-  const name = editableTitle(account.name, (newName) => {
-    const snapshot = getSnapshot()
-    const snapshotAccount = snapshot.accounts.find(a => a.id === account.id)
-    snapshotAccount.name = newName
-    commit(snapshot)
-
-    // We don't need to render everything
-    renderToolbar()
-  })
+  const name = make('h1')
+  name.className = 'font-semibold font-sm'
   header.append(name)
+    
+  editableText(
+    name, 
+    account.name, 
+    (newName) => {
+      const snapshot = getSnapshot()
+      const snapshotAccount = snapshot.accounts.find(a => a.id === account.id)
+      snapshotAccount.name = newName
+      commit(snapshot)
 
-  const balance = editableTitle(
+      // We don't need to render everything
+      renderToolbar()
+    }
+  )
+
+  const balance = make('h2')
+  header.append(balance)
+
+  editableText(
+    balance,
     money(accountValue(account)),
     (newBalance) => {
       const nextValue = sanitizeMoneyInput(newBalance)
@@ -241,17 +211,13 @@ function renderAccount(account) {
       // TODO: should only need to re-render total but
       // right now the formatting is not being applied
       renderEverything()
-    },
-    {
-      tag: 'h2',
-      editText: account.value
     }
   )
-  header.append(balance)
 
   const options = make('div')
   options.className = 'flex flex-1 justify-end items-end'
   wrapper.append(options)
+
   const deleteButton = make('button')
   deleteButton.className = 'button font-sm'
   deleteButton.textContent = 'Delete'
@@ -261,7 +227,31 @@ function renderAccount(account) {
     commit(snapshot)
     renderEverything()
   })
-  options.append(deleteButton)
+  // options.append(deleteButton)
+
+  const chart = make('div')
+  chart.className = 'flex items-end gap-0.5 mr-6'
+  const values = account.history.map(h => h.value)
+  const max = Math.max(...values)
+
+  for (const value of values) {
+    const bar = make('div')
+    bar.className = 'flex flex-column justify-end gap-0.5'
+    const percentage = value / max * 10
+    const dots = Math.round(percentage)
+    for (let i = 0; i < dots; i++) {
+      const dot = make('div')
+      dot.style.width = '2px'
+      dot.style.borderRadius = '4px'
+      dot.style.height = '2px'
+      dot.style.background = 'var(--text-color)'
+      bar.append(dot)
+    }
+    bar.style.height = `100%`
+    chart.append(bar)
+  }
+
+  options.append(chart)
 
   return wrapper
 }

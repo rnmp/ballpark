@@ -60,9 +60,7 @@ input, button, select, textarea {
   border-bottom-width: 1.5px;
   border-right-width: 1px;
   padding: 0.25em 0.65em;
-}
-
-.button {
+  background: var(--button-background-color);
   transition: scale 0.1s ease-in-out;
 }
 
@@ -81,6 +79,7 @@ input, button, select, textarea {
 }
 
 .flex   { display: flex; }
+.flex-column { flex-direction: column; }
 .flex-1 { flex: 1; }
 
 .items-center   { align-items: center; }
@@ -89,8 +88,13 @@ input, button, select, textarea {
 .justify-end    { justify-content: flex-end; }
 
 .border-none { border: none; }
+.border-t-0\.5 { border-top: 0.5px; border-top-style: solid; border-color: var(--text-color) ; }
+.border-b-0\.5 { border-bottom: 0.5px; border-bottom-style: solid; border-color: var(--text-color) ; }
+.border-l-0\.5 { border-left: 0.5px; border-left-style: solid; border-color: var(--text-color) ; }
 
 .bg-transparent { background: transparent; }
+
+.rounded-full { border-radius: 100% }
 
 .font-sm   { font-size: 0.75rem; }
 .font-base { font-size: 1rem; }
@@ -108,6 +112,7 @@ input, button, select, textarea {
 .font-bold      { font-weight: 700; }
 .font-extrabold { font-weight: 800; }
 
+.gap-0\.5 { gap: 0.125rem; }
 .gap-1 { gap: 0.25rem; }
 .gap-2 { gap: 0.50rem; }
 .gap-3 { gap: 0.75rem; }
@@ -129,17 +134,36 @@ input, button, select, textarea {
 .mb-5 { margin-bottom: 1.25rem; }
 .mb-6 { margin-bottom: 1.5rem; }
 
+.size-10 { width: 2.5rem; height: 2.5rem; }
+
+.mr-1 { margin-right: 0.25rem; }
+.mr-2 { margin-right: 0.50rem; }
+.mr-3 { margin-right: 0.75rem; }
+.mr-4 { margin-right: 1rem; }
+.mr-5 { margin-right: 1.25rem; }
+.mr-6 { margin-right: 1.5rem; }
+
 .py-0 { padding-top: 0;         padding-bottom: 0; }
 .py-1 { padding-top: 0.25rem;   padding-bottom: 0.25rem; }
 .py-2 { padding-top: 0.5rem;    padding-bottom: 0.5rem; }
+.py-3 { padding-top: 0.75rem;   padding-bottom: 0.75rem; }
+.py-4 { padding-top: 1rem;      padding-bottom: 1rem; }
 
 .px-1 { padding-right: 0.25rem; padding-left: 0.25rem; }
 .px-2 { padding-right: 0.5rem;  padding-left: 0.5rem; }
 .px-3 { padding-right: 0.75rem; padding-left: 0.75rem; }
 .px-4 { padding-right: 1rem;    padding-left: 1rem; }
 .px-5 { padding-right: 1.25rem; padding-left: 1.25rem; }
-.px-6 { padding-right: 1.5rem; padding-left: 1.5rem; }
+.px-6 { padding-right: 1.5rem;  padding-left: 1.5rem; }
 
+.pl-1 { padding-left: 0.25rem; }
+.pl-2 { padding-left: 0.50rem; }
+.pl-3 { padding-left: 0.75rem; }
+.pl-4 { padding-left: 1rem; }
+.pl-5 { padding-left: 1.25rem; }
+.pl-6 { padding-left: 1.5rem; }
+
+.p-0 { padding: 0; }
 .p-6 { padding: 1.5rem; }
 
 .tracking-wide { letter-spacing: 0.25em; }
@@ -160,28 +184,8 @@ main.suspended {
   scale: 0.98;
 }
 
-.account {
-  display: flex;
-  gap: 0.75rem;
-  border-top: 0.5px solid var(--text-color);
-  padding: 0.85rem 1.5rem;
-  align-items: center;
-}
-.account h1 {
-  font-weight: 600;
-  font-size: 0.75rem;
-}
-.account .icon {
-  width: 2.5rem;
-  height: 2.5rem;
+.icon {
   background: var(--button-background-color);
-  border: 0.5px solid var(--text-color);
-  border-bottom-width: 1.5px;
-  border-right-width: 1px;
-  border-radius: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 #modal_overlay {
