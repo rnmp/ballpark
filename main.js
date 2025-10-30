@@ -233,11 +233,13 @@ function renderAccount(account) {
   chart.className = 'flex items-end gap-0.5 mr-6'
   const values = account.history.map(h => h.value)
   const max = Math.max(...values)
+  const min = Math.min(...values)
+  const graphValues = values.map(v => v - min)
 
-  for (const value of values) {
+  for (const value of graphValues) {
     const bar = make('div')
     bar.className = 'flex flex-column justify-end gap-0.5'
-    const percentage = value / max * 10
+    const percentage = value / (max - min) * 10
     const dots = Math.round(percentage)
     for (let i = 0; i < dots; i++) {
       const dot = make('div')
