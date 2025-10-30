@@ -240,7 +240,7 @@ function renderAccount(account) {
     const bar = make('div')
     bar.className = 'flex flex-column justify-end gap-0.5'
     const percentage = value / (max - min) * 10
-    const dots = Math.round(percentage)
+    const dots = Math.round(percentage) || 1
     for (let i = 0; i < dots; i++) {
       const dot = make('div')
       dot.style.width = '2px'
