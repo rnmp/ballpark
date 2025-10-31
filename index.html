@@ -68,7 +68,7 @@
       <button type="submit" class="button">Save</button>
     </form>
     <div id="welcome_message" class="modal">
-      <h1 class="font-xl mb-5">Keep track of your net worth</h1>
+      <h1 class="font-xl mb-5">Track your net worth</h1>
 
       <p class="font-sm mb-4 leading-5">Nothing feels better than seeing your money grow. Whether you're paying off debt or building wealth, <span class="font-bold font-sm">Ballpark keeps it simple.</span></p>
 
@@ -83,11 +83,22 @@
       </ul>
 
       <div class="flex gap-2 mb-2">
-        <button type="button" class="button button-primary" id="start_fresh">Start Fresh</button>
-        <button type="button" class="button" id="demo_mode">Demo Mode</button>
+        <button type="button" class="button button-primary" id="demo_mode">Demo Mode</button>
+        <button type="button" class="button" id="start_fresh">Start Fresh</button>
       </div>
       <p class="font-sm">PS: You can restart via Settings</p>
     </div>
+    <form id="edit_account" class="modal">
+      <p data-account-type class="font-sm font-bold">Account Type</p>
+      <h1 class="font-xl mb-6" data-account-name>Change Account</h1>
+
+      <div id="account_emoji_selector" class="emoji-grid mb-8"></div>
+
+      <div class="flex gap-4 items-center">
+        <button id="delete_account_button" class="font-sm button" type="button">Delete Account</button>
+        <span class="font-sm mt-2">(You can undo this.)</span>
+      </div>
+    </form>
     <div id="settings" class="modal">
       <h1 class="font-xl mb-5">Settings</h1>
 

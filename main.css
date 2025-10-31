@@ -9,7 +9,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background-color: #000;
-    --background-color-highlight: #111;
+    --background-color-highlight: #131819;
     --button-background-color: #111;
     --text-color: #fff;
     --input-color: #444;
@@ -68,8 +68,8 @@ input, button, select, textarea {
 }
 
 .button-primary {
-  color: var(--button-background-color);
-  background: var(--text-color);
+  background-color: var(--text-color);
+  color: var(--background-color);
 }
 
 .button:active {
@@ -91,6 +91,14 @@ input, button, select, textarea {
 }
 .input-pair label {
   display: block;
+}
+.emoji-grid {
+  display: grid;
+  gap: 0.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(32px, 1fr));
+}
+.emoji-grid label {
+   aspect-ratio: 1 / 1;
 }
 
 .pointer-events-none { pointer-events: none; }
@@ -156,6 +164,8 @@ input, button, select, textarea {
 .mb-4 { margin-bottom: 1rem; }
 .mb-5 { margin-bottom: 1.25rem; }
 .mb-6 { margin-bottom: 1.5rem; }
+.mb-7 { margin-bottom: 1.75rem; }
+.mb-8 { margin-bottom: 2.0rem; }
 
 .size-10 { width: 2.5rem; height: 2.5rem; }
 
@@ -219,18 +229,6 @@ main.suspended {
   opacity: 0.8;
 }
 
-#new_account_form {
-  display: none;
-}
-
-#settings {
-  display: none;
-}
-
-#welcome_message {
-  display: none;
-}
-
 @keyframes fade-in {
   from {
     opacity: 0%;
@@ -254,6 +252,7 @@ main.suspended {
 }
 
 .modal {
+  display: none;
   background: var(--background-color);
   width: 400px;
   position: fixed;
@@ -270,19 +269,14 @@ main.suspended {
   animation-duration: 0.2s;
 }
 
+.modal.shown {
+  display: block;
+}
+
 #modal_overlay.shown {
   display: block;
   animation-name: fade-in;
   animation-duration: 0.2s;
-}
-#new_account_form.shown {
-  display: block;
-}
-#settings.shown {
-  display: block;
-}
-#welcome_message.shown {
-  display: block;
 }
 
 ul {
@@ -327,11 +321,7 @@ ul {
   gap: 0.5rem;
 }
 
-.account-type-option {
-  display: block;
-  opacity: 0.4;
-}
-
-.account-type-option:has(input:checked) {
-  opacity: 1;
+.select-option:has(input:checked) {
+  background-color: var(--text-color);
+  color: var(--background-color);
 }

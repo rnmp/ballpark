@@ -41,7 +41,7 @@ export function accountLabel(accountType) {
   }
 }
 
-function getAccountDisplay(accountType) {
+export function getAccountDisplay(accountType) {
   return {
     accountType,
     label: accountLabel(accountType),

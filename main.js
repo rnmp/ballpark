@@ -1,4 +1,4 @@
-import { accountEmoji, accountValue, getAccountDisplays } from './accounts.js'
+import { accountEmoji, accountValue, getAccountDisplay, getAccountDisplays, isLiability } from './accounts.js'
 import { money, sanitizeMoneyInput } from './money.js'
 import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData, empty, isOnboarded, finishOnboarding, resetOnboarding } from './data.js'
 import { $, make } from './dom.js'
@@ -22,14 +22,37 @@ $('#redo').addEventListener('click', () => {
 })
 
 $('#new_account').addEventListener('click',  () => {
-  modalOverlay.classList.add('shown')
-  newAccountForm.classList.add('shown')
-  newAccountForm.querySelector('input[name="name"]').focus()
   newAccountForm.querySelector('input[name="initial_value"]').setAttribute('placeholder', money(30000))
   newAccountForm.querySelector('input[value="savings"]').checked = true
-  activeModal = newAccountForm
-  $('main').classList.add('suspended')
+  presentModal(newAccountForm)
+  newAccountForm.querySelector('input[name="name"]').focus()
 })
+
+function populateAccountEmojiSelector() {
+  const emojiOptions = $('#account_emoji_selector')
+  const emojis = [
+    'none', '🏛️', '🏁', '🌧️', '🐷', '🫆', '💸', '✨', '⚡️', 
+    '❤️', '✅', '🚩', '👾', '🚗', '🏥', '🗄️', '💥', '🤖', 
+    '😎', '🤩', '🤓', '😍', '😭', '👶', '🥳', '😈', '👿'
+  ]
+
+  for (const emoji of emojis) {
+    const optionId = `account_emoji:${emoji}`
+    const optionLabel = make('label')
+    optionLabel.className = 'select-option button p-0 flex items-center justify-center'
+    optionLabel.htmlFor = optionId
+    optionLabel.textContent = emoji
+
+    const option = make('input')
+    option.id = optionId
+    option.setAttribute('type', 'radio')
+    option.setAttribute('name', 'account_emoji')
+    option.value = emoji
+    optionLabel.append(option)
+
+    emojiOptions.append(optionLabel)
+  }
+}
 
 function populateAccountTypeSelector() {
   const { assets, liabilities } = getAccountDisplays()
@@ -47,7 +70,7 @@ function populateAccountTypeSelector() {
   function makeOption ({ accountType, label, emoji }) {
     const optionId = `account_type:${accountType}`
     const optionLabel = make('label')
-    optionLabel.className = 'account-type-option button font-sm'
+    optionLabel.className = 'select-option button font-sm'
     optionLabel.htmlFor = optionId
     optionLabel.textContent = `${emoji} ${label}`
 
@@ -63,15 +86,12 @@ function populateAccountTypeSelector() {
 }
 
 $('#settings_button').addEventListener('click', () => {
-  modalOverlay.classList.add('shown')
-  const settingsModal = $('#settings')
-  settingsModal.classList.add('shown')
-  activeModal = settingsModal
-  $('main').classList.add('suspended')
-
   // Set currency selector to current value
   const snapshot = getSnapshot()
   $('#currency_selector').value = snapshot.currency || 'USD'
+
+  const settings = $('#settings')
+  presentModal(settings)
 })
 
 $('#currency_selector').addEventListener('change', (e) => {
@@ -173,15 +193,41 @@ function renderEverything() {
 }
 
 
+  $('#delete_account_button').addEventListener('click', () => {
+    if (!activeAccount) {
+      return
+    }
+
+    const snapshot = getSnapshot()
+    snapshot.accounts = snapshot.accounts.filter(a => a.id !== activeAccount.id)
+    commit(snapshot)
+
+    renderEverything()
+
+    closeActiveModal()
+  })
+
 function renderAccount(account) {
   const wrapper = make('div')
   wrapper.className = 'flex gap-3 items-center pl-6 border-t-0.5'
 
-  const emoji = make('div')
-  emoji.className = 'button p-0 size-10 flex items-center justify-center rounded-full'
-  emoji.textContent = accountEmoji(account.account_type)
+  const icon = make('div')
+  icon.className = 'button p-0 size-10 flex items-center justify-center rounded-full'
+  icon.textContent = accountEmoji(account.account_type)
+  icon.onclick = () => {
+    const editAccount = $('#edit_account')
+    const type = editAccount.querySelector('[data-account-type]')
+    const { emoji } = getAccountDisplay(account.account_type)
+    type.textContent = `${emoji} ${isLiability(account.account_type) ? 'Liability' : 'Asset'}`
+    const name = editAccount.querySelector('[data-account-name]')
+    name.textContent = account.name
 
-  wrapper.append(emoji)
+    activeAccount = account
+
+    presentModal(editAccount)
+  }
+
+  wrapper.append(icon)
 
   const header = make('header')
   header.className = 'py-3'
@@ -199,6 +245,7 @@ function renderAccount(account) {
       const snapshotAccount = snapshot.accounts.find(a => a.id === account.id)
       snapshotAccount.name = newName
       commit(snapshot)
+      account.name = newName
 
       // We don't need to render everything
       renderToolbar()
@@ -226,17 +273,6 @@ function renderAccount(account) {
   const options = make('div')
   options.className = 'flex flex-1 justify-end items-end'
   wrapper.append(options)
-
-  const deleteButton = make('button')
-  deleteButton.className = 'button font-sm'
-  deleteButton.textContent = 'Delete'
-  deleteButton.addEventListener('click', () => {
-    const snapshot = getSnapshot()
-    snapshot.accounts = snapshot.accounts.filter(a => a.id !== account.id)
-    commit(snapshot)
-    renderEverything()
-  })
-  // options.append(deleteButton)
 
   const historyValues = account.history.map(h => h.value).slice(-20)
   const [b, a] = historyValues.slice(-2)
@@ -295,6 +331,8 @@ function renderAccount(account) {
 
   options.append(chart)
 
+
+
   return wrapper
 }
 
@@ -308,15 +346,19 @@ function renderAccounts() {
   $('#accounts').append(...accountsUI)
 }
 
+function presentModal(node) {
+  modalOverlay.classList.add('shown')
+  node.classList.add('shown')
+  activeModal = node
+  $('main').classList.add('suspended')
+}
+
 function welcomeUser() {
   if (isOnboarded()) {
     return
   }
 
-  modalOverlay.classList.add('shown')
-  welcomeMessage.classList.add('shown')
-  activeModal = welcomeMessage
-  $('main').classList.add('suspended')
+  presentModal($('#welcome_message'))
 
   $('#start_fresh').addEventListener('click', () => {
     empty()
@@ -332,6 +374,7 @@ function welcomeUser() {
 function initialize() {
   welcomeUser()
   populateAccountTypeSelector()
+  populateAccountEmojiSelector()
   renderEverything()
 }
 initialize()

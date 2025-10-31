@@ -13,7 +13,7 @@ export function editableText(node, text, save) {
     save(input.value)
   })
 
-  node.append(input)
+  node.replaceChildren(input)
 
   return node
 }
