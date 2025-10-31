@@ -231,7 +231,7 @@ function renderAccount(account) {
   // options.append(deleteButton)
 
   const historyValues = account.history.map(h => h.value).slice(-20)
-  const [a, b] = historyValues.slice(-2)
+  const [b, a] = historyValues.slice(-2)
   if (a && b) {
     const button = make('button')
     button.className = 'bounce font-sm mr-4'
