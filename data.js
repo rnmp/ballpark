@@ -88,3 +88,25 @@ export function redo() {
   const snapshot = redos.pop()
   commit(snapshot)
 }
+
+export function empty() {
+  const snapshot = getSnapshot()
+  snapshot.accounts = snapshot.accounts.map(a => ({
+    ...a,
+    value: 0,
+    history: []
+  }))
+  commit(snapshot)
+}
+
+export function resetOnboarding() {
+  localStorage.removeItem('onboarded')
+}
+
+export function finishOnboarding() {
+  localStorage.setItem('onboarded', 'true')
+}
+
+export function isOnboarded() {
+  return Boolean(localStorage.getItem('onboarded'))
+}

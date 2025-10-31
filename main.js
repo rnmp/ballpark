@@ -1,12 +1,13 @@
 import { accountEmoji, accountValue, getAccountDisplays } from './accounts.js'
 import { money, sanitizeMoneyInput } from './money.js'
-import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData } from './data.js'
+import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData, empty, isOnboarded, finishOnboarding, resetOnboarding } from './data.js'
 import { $, make } from './dom.js'
 import { editableText, deltaToggle } from './components.js'
 import { delta } from './timeseries.js'
 
 const modalOverlay = $('#modal_overlay')
 const newAccountForm = $('#new_account_form')
+const welcomeMessage = $('#welcome_message')
 let activeModal = undefined;
 let activeAccount = undefined;
 
@@ -116,7 +117,10 @@ $('#export_data').addEventListener('click', () => {
 
 $('#reset_data_button').addEventListener('click', () => {
   resetData()
+  resetOnboarding()
   renderEverything()
+  activeModal.classList.remove('shown')
+  welcomeUser()
 })
 
 newAccountForm.addEventListener('submit', (e) => {
@@ -139,6 +143,10 @@ function closeActiveModal() {
   $('main').classList.remove('suspended')
   activeModal.classList.remove('shown')
   modalOverlay.classList.remove('shown')
+  if (activeModal === welcomeMessage) {
+    finishOnboarding()
+  }
+  activeModal = undefined
 }
 
 modalOverlay.addEventListener('click', () => {
@@ -241,7 +249,7 @@ function renderAccount(account) {
   }
 
   const chart = make('button')
-  chart.className = 'bounce flex items-end justify-end gap-0.5 mr-4 relative'
+  chart.className = 'bounce flex items-end justify-end gap-0.5 mr-6 relative'
   chart.style.width = `${2 * 20 + 2 * 19}px`
   chart.style.height = `${2 * 10 + 2 * 9}px`
   const max = Math.max(...historyValues)
@@ -266,7 +274,7 @@ function renderAccount(account) {
     bar.className = 'flex flex-column justify-end gap-0.5'
     for (let i = 0; i < 10; i++) {
       const dot = makeDot()
-      dot.style.opacity = 0.3
+      dot.style.opacity = 0.15
       bar.append(dot)
     }
     bar.style.height = `100%`
@@ -300,7 +308,29 @@ function renderAccounts() {
   $('#accounts').append(...accountsUI)
 }
 
+function welcomeUser() {
+  if (isOnboarded()) {
+    return
+  }
+
+  modalOverlay.classList.add('shown')
+  welcomeMessage.classList.add('shown')
+  activeModal = welcomeMessage
+  $('main').classList.add('suspended')
+
+  $('#start_fresh').addEventListener('click', () => {
+    empty()
+    renderEverything()
+    closeActiveModal()
+  })
+
+  $('#demo_mode').addEventListener('click', () => {
+    closeActiveModal()
+  })
+}
+
 function initialize() {
+  welcomeUser()
   populateAccountTypeSelector()
   renderEverything()
 }

@@ -32,6 +32,7 @@ html {
   overflow: hidden;
 }
 body {
+  cursor: default;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -55,6 +56,8 @@ input, button, select, textarea {
 }
 
 .button {
+  user-select: none;
+  -webkit-user-select: none;
   border-radius: 0.35em;
   border: 0.5px solid var(--text-color);
   border-bottom-width: 1.5px;
@@ -62,6 +65,11 @@ input, button, select, textarea {
   padding: 0.25em 0.65em;
   background: var(--button-background-color);
   transition: scale 0.1s ease-in-out;
+}
+
+.button-primary {
+  color: var(--button-background-color);
+  background: var(--text-color);
 }
 
 .button:active {
@@ -85,6 +93,8 @@ input, button, select, textarea {
   display: block;
 }
 
+.pointer-events-none { pointer-events: none; }
+
 .relative { position: relative; }
 .absolute { position: absolute; }
 
@@ -106,11 +116,14 @@ input, button, select, textarea {
 
 .rounded-full { border-radius: 100% }
 
+.leading-5 { line-height: 1.25rem; }
+.leading-6 { line-height: 1.5rem; }
+
 .font-sm   { font-size: 0.75rem; }
 .font-base { font-size: 1rem; }
 .font-lg   { font-size: 1.125rem; }
 .font-xl   { font-size: 1.25rem; }
-.font-2xl   { font-size: 1.5rem; }
+.font-2xl  { font-size: 1.5rem; }
 .font-3xl  { font-size: 1.875rem; }
 
 .w-full { width: 100%; }
@@ -214,6 +227,10 @@ main.suspended {
   display: none;
 }
 
+#welcome_message {
+  display: none;
+}
+
 @keyframes fade-in {
   from {
     opacity: 0%;
@@ -264,8 +281,13 @@ main.suspended {
 #settings.shown {
   display: block;
 }
+#welcome_message.shown {
+  display: block;
+}
 
-
+ul {
+  list-style-type: square;
+}
 
 #undo path, #redo path {
   stroke-width: 1px;
