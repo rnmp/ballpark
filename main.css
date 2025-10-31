@@ -108,9 +108,9 @@ input, button, select, textarea {
 .justify-end    { justify-content: flex-end; }
 
 .border-none { border: none; }
-.border-t-0\.5 { border-top: 0.5px; border-top-style: solid; border-color: var(--text-color) ; }
-.border-b-0\.5 { border-bottom: 0.5px; border-bottom-style: solid; border-color: var(--text-color) ; }
-.border-l-0\.5 { border-left: 0.5px; border-left-style: solid; border-color: var(--text-color) ; }
+.border-t-0\.5 { border-top: 0.5px;    border-top-style: solid;    border-color: var(--text-color); }
+.border-b-0\.5 { border-bottom: 0.5px; border-bottom-style: solid; border-color: var(--text-color); }
+.border-l-0\.5 { border-left: 0.5px;   border-left-style: solid;   border-color: var(--text-color); }
 
 .bg-transparent { background: transparent; }
 
