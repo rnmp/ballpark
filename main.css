@@ -68,6 +68,13 @@ input, button, select, textarea {
   scale: 0.95;
 }
 
+.bounce {
+  transition: scale 0.1s ease-in-out;
+}
+.bounce:active {
+  scale: 0.95;
+}
+
 .input-pair {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -77,6 +84,9 @@ input, button, select, textarea {
 .input-pair label {
   display: block;
 }
+
+.relative { position: relative; }
+.absolute { position: absolute; }
 
 .flex   { display: flex; }
 .flex-column { flex-direction: column; }

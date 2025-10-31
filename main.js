@@ -2,7 +2,8 @@ import { accountEmoji, accountValue, getAccountDisplays } from './accounts.js'
 import { money, sanitizeMoneyInput } from './money.js'
 import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData } from './data.js'
 import { $, make } from './dom.js'
-import { editableText } from './components.js'
+import { editableText, deltaToggle } from './components.js'
+import { delta } from './timeseries.js'
 
 const modalOverlay = $('#modal_overlay')
 const newAccountForm = $('#new_account_form')
@@ -229,12 +230,48 @@ function renderAccount(account) {
   })
   // options.append(deleteButton)
 
-  const chart = make('div')
-  chart.className = 'flex items-end gap-0.5 mr-6'
-  const values = account.history.map(h => h.value)
-  const max = Math.max(...values)
-  const min = Math.min(...values)
-  const graphValues = values.map(v => v - min)
+  const historyValues = account.history.map(h => h.value).slice(-20)
+  const [a, b] = historyValues.slice(-2)
+  if (a && b) {
+    const button = make('button')
+    button.className = 'bounce font-sm mr-4'
+    options.append(button)
+
+    deltaToggle(button, delta(a, b))
+  }
+
+  const chart = make('button')
+  chart.className = 'bounce flex items-end justify-end gap-0.5 mr-4 relative'
+  chart.style.width = `${2 * 20 + 2 * 19}px`
+  chart.style.height = `${2 * 10 + 2 * 9}px`
+  const max = Math.max(...historyValues)
+  const min = Math.min(...historyValues)
+  const graphValues = historyValues.map(v => v - min)
+
+  const makeDot = () => {
+    const dot = make('div')
+    dot.style.width = '2px'
+    dot.style.borderRadius = '0.75px'
+    dot.style.height = '2px'
+    dot.style.background = 'var(--text-color)'
+    return dot
+  }
+
+  const chartShadow = make('div')
+  chartShadow.className = 'flex items-end justify-end gap-0.5 absolute'
+  chart.append(chartShadow)
+
+  for (let i = 0; i < 20; i++) {
+    const bar = make('div')
+    bar.className = 'flex flex-column justify-end gap-0.5'
+    for (let i = 0; i < 10; i++) {
+      const dot = makeDot()
+      dot.style.opacity = 0.3
+      bar.append(dot)
+    }
+    bar.style.height = `100%`
+    chartShadow.append(bar)
+  }
 
   for (const value of graphValues) {
     const bar = make('div')
@@ -242,12 +279,7 @@ function renderAccount(account) {
     const percentage = value / (max - min) * 10
     const dots = Math.round(percentage) || 1
     for (let i = 0; i < dots; i++) {
-      const dot = make('div')
-      dot.style.width = '2px'
-      dot.style.borderRadius = '4px'
-      dot.style.height = '2px'
-      dot.style.background = 'var(--text-color)'
-      bar.append(dot)
+      bar.append(makeDot())
     }
     bar.style.height = `100%`
     chart.append(bar)
