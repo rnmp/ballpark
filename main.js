@@ -231,7 +231,7 @@ function renderAccount(account) {
   wrapper.className = 'flex gap-3 items-center pl-6 border-t-0.5'
 
   const icon = make('div')
-  icon.className = 'button p-0 size-10 flex items-center justify-center rounded-full'
+  icon.className = 'button p-0 font-lg size-10 flex items-center justify-center rounded-full'
   icon.textContent = account.icon || accountEmoji(account.account_type)
   icon.onclick = () => {
     const snapshotAccount = getAccount(account.id)
