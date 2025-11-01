@@ -17,6 +17,10 @@ export function getSnapshot() {
   return JSON.parse(JSON.stringify(netWorthData))
 }
 
+export function getAccount(id) {
+  return getSnapshot().accounts.find(a => a.id == id)
+}
+
 export function getCurrency() {
   return netWorthData.currency || 'USD'
 }

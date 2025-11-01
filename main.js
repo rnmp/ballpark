@@ -1,6 +1,6 @@
 import { accountEmoji, accountValue, getAccountDisplay, getAccountDisplays, isLiability } from './accounts.js'
 import { money, sanitizeMoneyInput } from './money.js'
-import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData, empty, isOnboarded, finishOnboarding, resetOnboarding } from './data.js'
+import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData, getAccount, empty, isOnboarded, finishOnboarding, resetOnboarding } from './data.js'
 import { $, make } from './dom.js'
 import { editableText, deltaToggle } from './components.js'
 import { delta } from './timeseries.js'
@@ -10,6 +10,7 @@ const newAccountForm = $('#new_account_form')
 const welcomeMessage = $('#welcome_message')
 let activeModal = undefined;
 let activeAccount = undefined;
+let activeIcon = undefined;
 
 $('#undo').addEventListener('click', () => {
   undo()
@@ -32,7 +33,7 @@ function populateAccountEmojiSelector() {
   const emojiOptions = $('#account_emoji_selector')
   const emojis = [
     'none', '🏛️', '🏁', '🌧️', '🐷', '🫆', '💸', '✨', '⚡️', 
-    '❤️', '✅', '🚩', '👾', '🚗', '🏥', '🗄️', '💥', '🤖', 
+    '❤️', '✅', '🖼️', '🖥️', '🚗', '🏥', '🗄️', '💥', '🤖', 
     '😎', '🤩', '🤓', '😍', '😭', '👶', '🥳', '😈', '👿'
   ]
 
@@ -41,13 +42,31 @@ function populateAccountEmojiSelector() {
     const optionLabel = make('label')
     optionLabel.className = 'select-option button p-0 flex items-center justify-center'
     optionLabel.htmlFor = optionId
-    optionLabel.textContent = emoji
+
+    const text = make('span')
+    text.textContent = emoji
+    optionLabel.append(text)
 
     const option = make('input')
     option.id = optionId
     option.setAttribute('type', 'radio')
     option.setAttribute('name', 'account_emoji')
     option.value = emoji
+    option.onclick = () => {
+      if (!activeAccount) {
+        return 
+      }
+
+      const snapshot = getSnapshot()
+      const account = snapshot.accounts.find(a => a.id === activeAccount.id)
+      account.icon = emoji === 'none' ? undefined : emoji
+      commit(snapshot)
+
+      const { emoji: defaultEmoji } = getAccountDisplay(account.account_type)
+      if (activeIcon) {
+        activeIcon.textContent = emoji === 'none' ? defaultEmoji : emoji
+      }
+    }
     optionLabel.append(option)
 
     emojiOptions.append(optionLabel)
@@ -213,16 +232,22 @@ function renderAccount(account) {
 
   const icon = make('div')
   icon.className = 'button p-0 size-10 flex items-center justify-center rounded-full'
-  icon.textContent = accountEmoji(account.account_type)
+  icon.textContent = account.icon || accountEmoji(account.account_type)
   icon.onclick = () => {
+    const snapshotAccount = getAccount(account.id)
     const editAccount = $('#edit_account')
     const type = editAccount.querySelector('[data-account-type]')
-    const { emoji } = getAccountDisplay(account.account_type)
-    type.textContent = `${emoji} ${isLiability(account.account_type) ? 'Liability' : 'Asset'}`
+    const { emoji } = getAccountDisplay(snapshotAccount.account_type)
+    type.textContent = `${emoji} ${isLiability(snapshotAccount.account_type) ? 'Liability' : 'Asset'}`
     const name = editAccount.querySelector('[data-account-name]')
-    name.textContent = account.name
+    name.textContent = snapshotAccount.name
 
-    activeAccount = account
+    activeAccount = snapshotAccount
+    activeIcon = icon
+
+    const currentIconName = snapshotAccount.icon ? snapshotAccount.icon : 'none'
+    editAccount.querySelector(`input[value='${currentIconName}'][name='account_emoji']`).checked = true
+    editAccount.querySelector(`label[for='account_emoji:none'] > span`).textContent = emoji
 
     presentModal(editAccount)
   }
