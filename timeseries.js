@@ -39,7 +39,7 @@ const account3 = [
 ]
 const account4 = [
   { date: '2023-12-30', value: 100 },
-  { date: '2023-12-31', value: 150 }, 
+  { date: '2023-12-31', value: 150 },
   { date: '2023-01-03', value: 200 }
 ]
 
@@ -62,7 +62,7 @@ const account4 = [
 //
 // Fallback (in order):
 // - Last available datapoint in current period (in practice, itself)
-// - Most immediately available (to the right)
+// - Most immediately available (to the left)
 // - 0
 
 

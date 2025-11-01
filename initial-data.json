@@ -10,7 +10,12 @@
       "name": "401K",
       "account_type": "investments",
       "value": 30000,
-      "history": []
+      "history": [
+        { "timestamp": "2025-10-28", "value": 30000 },
+        { "timestamp": "2025-10-27", "value": 28000 },
+        { "timestamp": "2025-10-26", "value": 26000 },
+        { "timestamp": "2025-10-25", "value": 40000 }
+      ]
     },
     {
       "name": "Emergency Fund",

@@ -22,7 +22,7 @@ $('#redo').addEventListener('click', () => {
   renderEverything()
 })
 
-$('#new_account').addEventListener('click',  () => {
+$('#new_account').addEventListener('click', () => {
   newAccountForm.querySelector('input[name="initial_value"]').setAttribute('placeholder', money(30000))
   newAccountForm.querySelector('input[value="savings"]').checked = true
   presentModal(newAccountForm)
@@ -32,8 +32,8 @@ $('#new_account').addEventListener('click',  () => {
 function populateAccountEmojiSelector() {
   const emojiOptions = $('#account_emoji_selector')
   const emojis = [
-    'none', '🏛️', '🏁', '🌧️', '🐷', '🫆', '💸', '✨', '⚡️', 
-    '❤️', '✅', '🖼️', '🖥️', '🚗', '🏥', '🍼', '🗄️', '💥', 
+    'none', '🏛️', '🏁', '🌧️', '🐷', '🫆', '💸', '✨', '⚡️',
+    '❤️', '✅', '🖼️', '🖥️', '🚗', '🏥', '🍼', '🗄️', '💥',
     '😎', '🤩', '🤓', '😍', '😭', '🥳', '🤖', '😈', '👿'
   ]
 
@@ -54,7 +54,7 @@ function populateAccountEmojiSelector() {
     option.value = emoji
     option.onclick = () => {
       if (!activeAccount) {
-        return 
+        return
       }
 
       const snapshot = getSnapshot()
@@ -86,7 +86,7 @@ function populateAccountTypeSelector() {
     liabilityOptions.append(makeOption(liabilityType))
   }
 
-  function makeOption ({ accountType, label, emoji }) {
+  function makeOption({ accountType, label, emoji }) {
     const optionId = `account_type:${accountType}`
     const optionLabel = make('label')
     optionLabel.className = 'select-option button font-sm'
@@ -167,10 +167,10 @@ newAccountForm.addEventListener('submit', (e) => {
   const form = e.target
   const data = new FormData(form)
 
-  createAccount({ 
-    name: data.get("name") || "Account", 
-    accountType: data.get("account_type"), 
-    balance: sanitizeMoneyInput(data.get("initial_value")) 
+  createAccount({
+    name: data.get("name") || "Account",
+    accountType: data.get("account_type"),
+    balance: sanitizeMoneyInput(data.get("initial_value"))
   })
 
   closeActiveModal()
@@ -212,19 +212,19 @@ function renderEverything() {
 }
 
 
-  $('#delete_account_button').addEventListener('click', () => {
-    if (!activeAccount) {
-      return
-    }
+$('#delete_account_button').addEventListener('click', () => {
+  if (!activeAccount) {
+    return
+  }
 
-    const snapshot = getSnapshot()
-    snapshot.accounts = snapshot.accounts.filter(a => a.id !== activeAccount.id)
-    commit(snapshot)
+  const snapshot = getSnapshot()
+  snapshot.accounts = snapshot.accounts.filter(a => a.id !== activeAccount.id)
+  commit(snapshot)
 
-    renderEverything()
+  renderEverything()
 
-    closeActiveModal()
-  })
+  closeActiveModal()
+})
 
 function renderAccount(account) {
   const wrapper = make('div')
@@ -261,10 +261,10 @@ function renderAccount(account) {
   const name = make('h1')
   name.className = 'font-semibold font-sm'
   header.append(name)
-    
+
   editableText(
-    name, 
-    account.name, 
+    name,
+    account.name,
     (newName) => {
       const snapshot = getSnapshot()
       const snapshotAccount = snapshot.accounts.find(a => a.id === account.id)
@@ -325,11 +325,15 @@ function renderAccountHistory(account) {
   modal.className = 'modal'
   document.body.append(modal)
 
-  const historyValues = account.history.map(h => h.value).slice(-43)
-  const chart = dotChart(historyValues, { size: 6, maxCount: 43 })
-  modal.append(chart)
+  const historyValues = account.history.map(h => h.value).slice(-46)
+  const chartContainer = make('div')
+  chartContainer.className = 'px-4 py-4'
+  modal.append(chartContainer)
+  const chart = dotChart(historyValues, { size: 6, maxCount: 46 })
+  chartContainer.append(chart)
 
   const ul = make('ul')
+  ul.className = 'list-none'
   modal.append(ul)
 
   const orderedHistory = account.history.toSorted(
@@ -338,13 +342,30 @@ function renderAccountHistory(account) {
   for (let i = 0; i < orderedHistory.length; i++) {
     const history = orderedHistory.at(i)
     const prevHistory = orderedHistory.at(i + 1)
-    let content = money(history.value)
+    let change = undefined
     if (prevHistory) {
-      const deltaz = delta(history.value, prevHistory.value)
-      content = content + ` ${money(deltaz.value)}`
+      change = delta(history.value, prevHistory.value)
     }
+
     const li = make('li')
-    li.textContent = content
+    li.className = 'border-t-0.5 px-4 py-2 flex font-sm'
+
+    const time = make('time')
+    time.datetime = history.timestamp
+    time.textContent = history.timestamp
+    li.append(time)
+
+    const balance = make('span')
+    balance.textContent = money(history.value)
+    li.append(balance)
+
+    if (change) {
+      const changeDisplay = make('button')
+      changeDisplay.className = 'bounce'
+      li.append(changeDisplay)
+      deltaToggle(changeDisplay, change)
+    }
+
     ul.append(li)
   }
 

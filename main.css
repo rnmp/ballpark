@@ -19,7 +19,7 @@
 * {
   margin: 0;
   padding: 0;
-  font-size: 1rem;
+  font-size: inherit;
   font-weight: 400;
   box-sizing: border-box;
 }
@@ -32,6 +32,7 @@ html {
   overflow: hidden;
 }
 body {
+  font-size: 1rem;
   cursor: default;
   display: flex;
   flex-direction: column;
@@ -176,6 +177,10 @@ input, button, select, textarea {
 .mr-5 { margin-right: 1.25rem; }
 .mr-6 { margin-right: 1.5rem; }
 
+.p-0 { padding: 0; }
+.p-6 { padding: 1.5rem; }
+.p-7 { padding: 1.75rem; }
+
 .py-0 { padding-top: 0;         padding-bottom: 0; }
 .py-1 { padding-top: 0.25rem;   padding-bottom: 0.25rem; }
 .py-2 { padding-top: 0.5rem;    padding-bottom: 0.5rem; }
@@ -188,6 +193,7 @@ input, button, select, textarea {
 .px-4 { padding-right: 1rem;    padding-left: 1rem; }
 .px-5 { padding-right: 1.25rem; padding-left: 1.25rem; }
 .px-6 { padding-right: 1.5rem;  padding-left: 1.5rem; }
+.px-7 { padding-right: 1.75rem;  padding-left: 1.75rem; }
 
 .pl-1 { padding-left: 0.25rem; }
 .pl-2 { padding-left: 0.50rem; }
@@ -196,8 +202,12 @@ input, button, select, textarea {
 .pl-5 { padding-left: 1.25rem; }
 .pl-6 { padding-left: 1.5rem; }
 
-.p-0 { padding: 0; }
-.p-6 { padding: 1.5rem; }
+.pt-1 { padding-top: 0.25rem; }
+.pt-2 { padding-top: 0.50rem; }
+.pt-3 { padding-top: 0.75rem; }
+.pt-4 { padding-top: 1rem; }
+.pt-5 { padding-top: 1.25rem; }
+.pt-6 { padding-top: 1.5rem; }
 
 .tracking-wide { letter-spacing: 0.25em; }
 .uppercase     { text-transform: uppercase; }
@@ -258,7 +268,6 @@ main.suspended {
   position: fixed;
   top: 50%;
   left: 50%;
-  padding: 24px 28px 28px;
   transform-origin: 0 0;
   transform: translateX(-50%) translateY(-50%);
   border: 0.5px solid var(--text-color);
@@ -281,6 +290,9 @@ main.suspended {
 
 ul {
   list-style-type: square;
+}
+.list-none {
+  list-style-type: none;
 }
 
 #undo path, #redo path {

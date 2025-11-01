@@ -1,7 +1,7 @@
 import INITIAL_DATA from './initial-data.json' with { type: 'json' }
 
 const initialData = INITIAL_DATA
-initialData.accounts = initialData.accounts.map(a => ({ ...a, id: crypto.randomUUID(), history: [produceHistory(a.value)] }))
+initialData.accounts = initialData.accounts.map(a => ({ ...a, id: crypto.randomUUID(), history: a.history.length ? a.history : [produceHistory(a.value)] }))
 
 let netWorthData = initialData
 try {
@@ -9,7 +9,7 @@ try {
   if (parsedNetWorthData) {
     netWorthData = parsedNetWorthData
   }
-} catch(e) {
+} catch (e) {
 }
 Object.freeze(netWorthData)
 
@@ -64,11 +64,11 @@ export function produceHistory(value) {
 
 export function createAccount({ name, accountType, balance }) {
   const snapshot = getSnapshot()
-  snapshot.accounts.push({ 
-    id: crypto.randomUUID(), 
-    name, 
-    account_type: accountType, 
-    value: balance, 
+  snapshot.accounts.push({
+    id: crypto.randomUUID(),
+    name,
+    account_type: accountType,
+    value: balance,
     history: [produceHistory(balance)],
   })
   commit(snapshot)

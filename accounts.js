@@ -9,7 +9,7 @@ const ACCOUNT_TYPES = [
   'mortgage',
 ]
 
-export function isLiability (accountType) {
+export function isLiability(accountType) {
   return ['car_loan', 'student_loan', 'mortgage', 'credit_card'].includes(accountType)
 }
 
