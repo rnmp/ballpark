@@ -33,8 +33,8 @@ function populateAccountEmojiSelector() {
   const emojiOptions = $('#account_emoji_selector')
   const emojis = [
     'none', '🏛️', '🏁', '🌧️', '🐷', '🫆', '💸', '✨', '⚡️', 
-    '❤️', '✅', '🖼️', '🖥️', '🚗', '🏥', '🗄️', '💥', '🤖', 
-    '😎', '🤩', '🤓', '😍', '😭', '👶', '🥳', '😈', '👿'
+    '❤️', '✅', '🖼️', '🖥️', '🚗', '🏥', '🍼', '🗄️', '💥', 
+    '😎', '🤩', '🤓', '😍', '😭', '🥳', '🤖', '😈', '👿'
   ]
 
   for (const emoji of emojis) {
