@@ -299,7 +299,7 @@ function renderAccount(account) {
   options.className = 'flex flex-1 justify-end items-end'
   wrapper.append(options)
 
-  const historyValues = account.history.map(h => h.value).slice(-20)
+  const historyValues = account.history.map(h => h.value).slice(-30)
   const [b, a] = historyValues.slice(-2)
   if (a && b) {
     const button = make('button')
@@ -309,10 +309,46 @@ function renderAccount(account) {
     deltaToggle(button, delta(a, b))
   }
 
-  const chart = dotChart(historyValues)
+  const chart = dotChart(historyValues, { size: 2, maxCount: 30 })
+  chart.className = chart.className.concat(' mr-6 bounce')
+  chart.onclick = () => {
+    const accountHistory = renderAccountHistory(account)
+    presentModal(accountHistory)
+  }
   options.append(chart)
 
   return wrapper
+}
+
+function renderAccountHistory(account) {
+  const modal = make('div')
+  modal.className = 'modal'
+  document.body.append(modal)
+
+  const historyValues = account.history.map(h => h.value).slice(-43)
+  const chart = dotChart(historyValues, { size: 6, maxCount: 43 })
+  modal.append(chart)
+
+  const ul = make('ul')
+  modal.append(ul)
+
+  const orderedHistory = account.history.toSorted(
+    (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+  )
+  for (let i = 0; i < orderedHistory.length; i++) {
+    const history = orderedHistory.at(i)
+    const prevHistory = orderedHistory.at(i + 1)
+    let content = money(history.value)
+    if (prevHistory) {
+      const deltaz = delta(history.value, prevHistory.value)
+      content = content + ` ${money(deltaz.value)}`
+    }
+    const li = make('li')
+    li.textContent = content
+    ul.append(li)
+  }
+
+  return modal
 }
 
 function renderAccounts() {

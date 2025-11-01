@@ -46,9 +46,10 @@ export function deltaToggle(node, delta) {
 
 export function dotChart(values, { size, maxCount } = { size: 2, maxCount: 20 }) {
   const chart = make('button')
-  chart.className = 'bounce flex items-end justify-end gap-0.5 mr-6 relative'
-  chart.style.width = `${size * maxCount + size * (maxCount - 1)}px`
-  chart.style.height = `${size * 10 + size * 9}px`
+  chart.className = 'flex items-end justify-end relative'
+  chart.style.gap = `2px`
+  chart.style.width = `${size * maxCount + 2 * (maxCount - 1)}px`
+  chart.style.height = `${size * 10 + 2 * 9}px`
   const max = Math.max(...values)
   const min = Math.min(...values)
   const graphValues = values.map(v => v - min)
