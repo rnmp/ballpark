@@ -8,7 +8,7 @@ export function editableText(node, text, save) {
   input.value = text
   input.addEventListener('blur', () => {
     if (input.value === text) {
-      return 
+      return
     }
     save(input.value)
   })
@@ -21,7 +21,7 @@ export function editableText(node, text, save) {
 export function deltaToggle(node, delta) {
   const value = money(delta.value)
   const decoration = (value.startsWith('-') ? '' : '+')
-  const percentage = `${Math.round(delta.percentage * 100)}%`
+  const percentage = `${Math.ceil(delta.percentage * 100 * 10) / 10}%`
   const type = 'delta_toggle'
 
   node.dataset.component = type

@@ -352,7 +352,7 @@ function renderAccountHistory(account) {
 
     const time = make('time')
     time.datetime = history.timestamp
-    time.textContent = history.timestamp
+    time.textContent = history.timestamp.split('T')[0]
     li.append(time)
 
     const balance = make('span')
