@@ -2,7 +2,7 @@ import { accountEmoji, accountValue, getAccountDisplay, getAccountDisplays, isLi
 import { money, sanitizeMoneyInput } from './money.js'
 import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData, getAccount, empty, isOnboarded, finishOnboarding, resetOnboarding } from './data.js'
 import { $, make } from './dom.js'
-import { editableText, deltaToggle } from './components.js'
+import { editableText, deltaToggle, dotChart } from './components.js'
 import { delta } from './timeseries.js'
 
 const modalOverlay = $('#modal_overlay')
@@ -309,54 +309,8 @@ function renderAccount(account) {
     deltaToggle(button, delta(a, b))
   }
 
-  const chart = make('button')
-  chart.className = 'bounce flex items-end justify-end gap-0.5 mr-6 relative'
-  chart.style.width = `${2 * 20 + 2 * 19}px`
-  chart.style.height = `${2 * 10 + 2 * 9}px`
-  const max = Math.max(...historyValues)
-  const min = Math.min(...historyValues)
-  const graphValues = historyValues.map(v => v - min)
-
-  const makeDot = () => {
-    const dot = make('div')
-    dot.style.width = '2px'
-    dot.style.borderRadius = '0.75px'
-    dot.style.height = '2px'
-    dot.style.background = 'var(--text-color)'
-    return dot
-  }
-
-  const chartShadow = make('div')
-  chartShadow.className = 'flex items-end justify-end gap-0.5 absolute'
-  chart.append(chartShadow)
-
-  for (let i = 0; i < 20; i++) {
-    const bar = make('div')
-    bar.className = 'flex flex-column justify-end gap-0.5'
-    for (let i = 0; i < 10; i++) {
-      const dot = makeDot()
-      dot.style.opacity = 0.15
-      bar.append(dot)
-    }
-    bar.style.height = `100%`
-    chartShadow.append(bar)
-  }
-
-  for (const value of graphValues) {
-    const bar = make('div')
-    bar.className = 'flex flex-column justify-end gap-0.5'
-    const percentage = value / (max - min) * 10
-    const dots = Math.round(percentage) || 1
-    for (let i = 0; i < dots; i++) {
-      bar.append(makeDot())
-    }
-    bar.style.height = `100%`
-    chart.append(bar)
-  }
-
+  const chart = dotChart(historyValues)
   options.append(chart)
-
-
 
   return wrapper
 }
