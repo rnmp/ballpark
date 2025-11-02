@@ -113,10 +113,11 @@ input, button, select, textarea {
 .flex-column { flex-direction: column; }
 .flex-1 { flex: 1; }
 
-.items-center   { align-items: center; }
-.items-end      { align-items: flex-end; }
-.justify-center { justify-content: center; }
-.justify-end    { justify-content: flex-end; }
+.items-center    { align-items: center; }
+.items-end       { align-items: flex-end; }
+.justify-center  { justify-content: center; }
+.justify-end     { justify-content: flex-end; }
+.justify-between { justify-content: space-between }
 
 .border-none { border: none; }
 .border-t-0\.5 { border-top: 0.5px;    border-top-style: solid;    border-color: var(--text-color); }

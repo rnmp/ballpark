@@ -374,7 +374,9 @@ function renderAccountHistory(account) {
   chartContainer.append(chart)
 
   const ul = make('ul')
-  ul.className = 'list-none'
+  ul.className = 'list-none border-t-0.5'
+  ul.style.maxHeight = '300px'
+  ul.style.overflow = 'scroll'
   modal.append(ul)
 
   const orderedHistory = account.history.toSorted(
@@ -389,22 +391,35 @@ function renderAccountHistory(account) {
     }
 
     const li = make('li')
-    li.className = 'border-t-0.5 px-4 py-2 flex font-sm'
+    li.className = 'border-t-0.5 px-4 py-2 flex justify-between'
+    if (i === 0) {
+      li.classList.remove('border-t-0.5')
+    }
+
+    const valueContainer = make('div')
+    valueContainer.className = 'flex flex-column gap-1'
+    li.append(valueContainer)
 
     const time = make('time')
+    time.className = 'font-sm font-semibold'
     time.datetime = history.timestamp
     time.textContent = history.timestamp.split('T')[0]
-    li.append(time)
+    valueContainer.append(time)
 
     const balance = make('span')
+    // balance.className = 'font-sm font-semibold'
     balance.textContent = money(history.value)
-    li.append(balance)
+    valueContainer.append(balance)
 
     if (change) {
       const changeDisplay = make('button')
-      changeDisplay.className = 'bounce'
+      changeDisplay.className = 'bounce font-sm'
       li.append(changeDisplay)
       deltaToggle(changeDisplay, change)
+    }
+
+    li.onmouseover = () => {
+      // alert('sup')
     }
 
     ul.append(li)
