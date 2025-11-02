@@ -279,6 +279,7 @@ main.suspended {
   border-radius: 0.85rem;
   animation-name: modal-slide-up;
   animation-duration: 0.2s;
+  overflow: hidden;
 }
 
 .modal.shown {

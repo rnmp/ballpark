@@ -45,7 +45,7 @@ export function deltaToggle(node, delta) {
 }
 
 export function dotChart(values, { size, maxCount } = { size: 2, maxCount: 20 }) {
-  const chart = make('button')
+  const chart = make('div')
   chart.className = 'flex items-end justify-end relative'
   chart.style.gap = `2px`
   chart.style.width = `${size * maxCount + 2 * (maxCount - 1)}px`
@@ -59,7 +59,7 @@ export function dotChart(values, { size, maxCount } = { size: 2, maxCount: 20 })
     dot.style.width = `${size}px`
     dot.style.borderRadius = '0.75px'
     dot.style.height = `${size}px`
-    dot.style.background = 'var(--text-color)'
+    dot.style.background = 'currentColor'
     return dot
   }
 
@@ -70,6 +70,7 @@ export function dotChart(values, { size, maxCount } = { size: 2, maxCount: 20 })
   for (let i = 0; i < maxCount; i++) {
     const bar = make('div')
     bar.className = 'flex flex-column justify-end gap-0.5'
+    bar.style.color = 'var(--text-color)'
     for (let i = 0; i < 10; i++) {
       const dot = makeDot()
       dot.style.opacity = 0.15
@@ -79,16 +80,59 @@ export function dotChart(values, { size, maxCount } = { size: 2, maxCount: 20 })
     chartShadow.append(bar)
   }
 
-  for (const value of graphValues) {
+  const bars = []
+  let barMouseOverHandler = undefined
+  let barMouseOutHandler = undefined
+
+  for (let i = 0; i < graphValues.length; i++) {
+    const value = graphValues[i]
     const bar = make('div')
-    bar.className = 'flex flex-column justify-end gap-0.5'
+    bar.className = 'flex flex-column justify-end gap-0.5 relative'
+    bar.style.color = 'var(--text-color)'
     const percentage = value / (max - min) * 10
     const dots = Math.round(percentage) || 1
     for (let i = 0; i < dots; i++) {
       bar.append(makeDot())
     }
     bar.style.height = `100%`
+    bar.onmouseover = () => {
+      if (!barMouseOverHandler) {
+        return
+      }
+      bar.style.color = '#f00'
+      barMouseOverHandler(i)
+    }
+
+    bar.onmouseout = () => {
+      for (const sibling of bars) {
+        sibling.style.color = 'var(--text-color)'
+      }
+      if (!barMouseOutHandler) {
+        return
+      }
+      barMouseOutHandler()
+    }
+
     chart.append(bar)
+    bars.push(bar)
+  }
+
+  chart.select = (index) => {
+    const barIndex = bars.length - 1 - index
+    const selectedBar = bars[barIndex]
+    if (selectedBar) {
+      selectedBar.style.color = '#f00'
+    }
+  }
+  chart.deselect = () => {
+    for (const bar of bars) {
+      bar.style.color = 'var(--text-color)'
+    }
+  }
+
+  chart.registerHandlers = ({ mouseOver, mouseOut }) => {
+    barMouseOverHandler = mouseOver
+    barMouseOutHandler = mouseOut
   }
 
   return chart

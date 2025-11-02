@@ -407,7 +407,6 @@ function renderAccountHistory(account) {
     valueContainer.append(time)
 
     const balance = make('span')
-    // balance.className = 'font-sm font-semibold'
     balance.textContent = money(history.value)
     valueContainer.append(balance)
 
@@ -419,11 +418,35 @@ function renderAccountHistory(account) {
     }
 
     li.onmouseover = () => {
-      // alert('sup')
+      chart.select(i)
+      li.style.background = 'color-mix(in srgb, var(--text-color) 10%, transparent)'
+    }
+
+    li.onmouseout = () => {
+      chart.deselect()
+      for (const item of ul.children) {
+        item.style.background = ''
+      }
     }
 
     ul.append(li)
   }
+
+  chart.registerHandlers({
+    mouseOver: (barIndex) => {
+      const item = ul.children[ul.children.length - 1 - barIndex]
+      if (!item) {
+        return
+      }
+      item.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
+      item.style.background = 'color-mix(in srgb, var(--text-color) 10%, transparent)'
+    },
+    mouseOut: () => {
+      for (const item of ul.children) {
+        item.style.background = ''
+      }
+    }
+  })
 
   return modal
 }
