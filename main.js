@@ -314,6 +314,7 @@ function renderAccount(account) {
       }
 
       renderTotal()
+      renderToolbar()
 
       const accountRow = accountRows.get(account.id)
       const newAccountRow = renderAccount(updatedAccount)
