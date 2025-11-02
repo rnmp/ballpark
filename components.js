@@ -104,11 +104,11 @@ export function dotChart(values, { size, maxCount } = { size: 2, maxCount: 20 })
     }
 
     bar.onmouseout = () => {
-      for (const sibling of bars) {
-        sibling.style.color = 'var(--text-color)'
-      }
       if (!barMouseOutHandler) {
         return
+      }
+      for (const sibling of bars) {
+        sibling.style.color = 'var(--text-color)'
       }
       barMouseOutHandler()
     }
