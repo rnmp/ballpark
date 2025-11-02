@@ -224,17 +224,13 @@ $('#delete_account_button').addEventListener('click', async () => {
 
   closeActiveModal()
 
-  await sleep(200)
-
   const accountRow = accountRows.get(activeAccount.id)
   accountRow.style.opacity = 0.0
-  accountRow.style.height = '69px'
-
-  await sleep(1)
   accountRow.style.height = '0px'
 
-  await sleep(500)
-  $('#accounts').removeChild(accountRow)
+  await sleep(200)
+
+  accountsList.removeChild(accountRow)
   accountRows.delete(activeAccount.id)
 
   const snapshot = getSnapshot()
@@ -247,7 +243,7 @@ $('#delete_account_button').addEventListener('click', async () => {
 
 function renderAccount(account) {
   const wrapper = make('div')
-  wrapper.className = 'flex gap-3 items-center pl-6 border-t-0.5 transition-all'
+  wrapper.className = 'flex gap-3 items-center pl-6 border-t-0.5 transition-all h-18'
 
   const icon = make('div')
   icon.className = 'button p-0 font-lg size-10 flex items-center justify-center rounded-full'
@@ -274,7 +270,6 @@ function renderAccount(account) {
   wrapper.append(icon)
 
   const header = make('header')
-  header.className = 'py-3'
   wrapper.append(header)
 
   const name = make('h1')

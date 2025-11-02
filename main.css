@@ -107,7 +107,7 @@ input, button, select, textarea {
 .relative { position: relative; }
 .absolute { position: absolute; }
 
-.transition-all { transition: all .5s ease-in-out; }
+.transition-all { transition: all .2s ease-in-out; }
 
 .flex   { display: flex; }
 .flex-column { flex-direction: column; }
@@ -171,6 +171,7 @@ input, button, select, textarea {
 .mb-7 { margin-bottom: 1.75rem; }
 .mb-8 { margin-bottom: 2.0rem; }
 
+.h-18 { height: 4.5rem; }
 .size-10 { width: 2.5rem; height: 2.5rem; }
 
 .mr-1 { margin-right: 0.25rem; }
