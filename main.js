@@ -8,6 +8,7 @@ import { delta } from './timeseries.js'
 const modalOverlay = $('#modal_overlay')
 const newAccountForm = $('#new_account_form')
 const welcomeMessage = $('#welcome_message')
+const accountsList = $('#accounts')
 let activeModal = undefined;
 let activeAccount = undefined;
 let activeIcon = undefined;
@@ -313,27 +314,11 @@ function renderAccount(account) {
         return
       }
 
-      renderTotal()
       renderToolbar()
-
-      const accountRow = accountRows.get(account.id)
-      const newAccountRow = renderAccount(updatedAccount)
-
-      const sortedAccounts = getSnapshot()
-        .accounts
-        .toSorted((a, b) => accountValue(b) - accountValue(a))
-      const accountIndex = sortedAccounts.findIndex(a => a.id === account.id)
-      const prevAccountId = sortedAccounts.at(accountIndex + 1)?.id
-      const prevAccountRow = accountRows.get(prevAccountId)
-
-      if (prevAccountRow) {
-        $('#accounts').insertBefore(newAccountRow, prevAccountRow)
-      } else {
-        accountRow.nextSibling.after(newAccountRow)
-      }
-      $('#accounts').removeChild(accountRow)
-
-      accountRows.set(account.id, newAccountRow)
+      document.dispatchEvent(new CustomEvent('account-balance-changed', {
+        bubbles: true,
+        detail: { updatedAccount }
+      }))
     }
   )
 
@@ -361,6 +346,32 @@ function renderAccount(account) {
 
   return wrapper
 }
+
+document.addEventListener('account-balance-changed', (e) => {
+  const { updatedAccount } = e.detail
+  const accountId = updatedAccount.id
+
+  const accountRow = accountRows.get(accountId)
+  const newAccountRow = renderAccount(updatedAccount)
+
+  const sortedAccounts = getSnapshot()
+    .accounts
+    .toSorted((a, b) => accountValue(b) - accountValue(a))
+  const accountIndex = sortedAccounts.findIndex(a => a.id === accountId)
+  const prevAccountId = sortedAccounts.at(accountIndex + 1)?.id
+  const prevAccountRow = accountRows.get(prevAccountId)
+
+  if (prevAccountRow) {
+    accountsList.insertBefore(newAccountRow, prevAccountRow)
+  } else {
+    accountRow.nextSibling.after(newAccountRow)
+  }
+  accountsList.removeChild(accountRow)
+
+  accountRows.set(accountId, newAccountRow)
+
+  renderTotal()
+})
 
 function renderAccountHistory(account) {
   const modal = make('div')
@@ -465,8 +476,8 @@ function renderAccounts() {
     accountUIs.push(accountUI)
   }
 
-  $('#accounts').innerHTML = ''
-  $('#accounts').append(...accountUIs)
+  accountsList.innerHTML = ''
+  accountsList.append(...accountUIs)
 }
 
 function presentModal(node) {
