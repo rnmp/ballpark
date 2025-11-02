@@ -81,6 +81,8 @@ export function updateBalance({ balance, accountId }) {
   snapshotAccount.history.push(produceHistory(balance))
 
   commit(snapshot)
+
+  return snapshotAccount
 }
 
 export function undo() {

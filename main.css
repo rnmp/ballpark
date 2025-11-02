@@ -107,6 +107,8 @@ input, button, select, textarea {
 .relative { position: relative; }
 .absolute { position: absolute; }
 
+.transition-all { transition: all .5s ease-in-out; }
+
 .flex   { display: flex; }
 .flex-column { flex-direction: column; }
 .flex-1 { flex: 1; }

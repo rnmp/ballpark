@@ -11,6 +11,7 @@ const welcomeMessage = $('#welcome_message')
 let activeModal = undefined;
 let activeAccount = undefined;
 let activeIcon = undefined;
+const accountRows = new Map()
 
 $('#undo').addEventListener('click', () => {
   undo()
@@ -212,23 +213,40 @@ function renderEverything() {
 }
 
 
-$('#delete_account_button').addEventListener('click', () => {
+
+const sleep = (num) => new Promise(resolve => setTimeout(resolve, num))
+
+$('#delete_account_button').addEventListener('click', async () => {
   if (!activeAccount) {
     return
   }
+
+  closeActiveModal()
+
+  await sleep(200)
+
+  const accountRow = accountRows.get(activeAccount.id)
+  accountRow.style.opacity = 0.0
+  accountRow.style.height = '69px'
+
+  await sleep(1)
+  accountRow.style.height = '0px'
+
+  await sleep(500)
+  $('#accounts').removeChild(accountRow)
+  accountRows.delete(activeAccount.id)
 
   const snapshot = getSnapshot()
   snapshot.accounts = snapshot.accounts.filter(a => a.id !== activeAccount.id)
   commit(snapshot)
 
-  renderEverything()
-
-  closeActiveModal()
+  renderTotal()
+  renderToolbar()
 })
 
 function renderAccount(account) {
   const wrapper = make('div')
-  wrapper.className = 'flex gap-3 items-center pl-6 border-t-0.5'
+  wrapper.className = 'flex gap-3 items-center pl-6 border-t-0.5 transition-all'
 
   const icon = make('div')
   icon.className = 'button p-0 font-lg size-10 flex items-center justify-center rounded-full'
@@ -285,13 +303,36 @@ function renderAccount(account) {
     money(accountValue(account)),
     (newBalance) => {
       const nextValue = sanitizeMoneyInput(newBalance)
+
+      let updatedAccount = undefined
       if (account.value !== nextValue) {
-        updateBalance({ balance: nextValue, accountId: account.id })
+        updatedAccount = updateBalance({ balance: nextValue, accountId: account.id })
       }
 
-      // TODO: should only need to re-render total but
-      // right now the formatting is not being applied
-      renderEverything()
+      if (!updatedAccount) {
+        return
+      }
+
+      renderTotal()
+
+      const accountRow = accountRows.get(account.id)
+      const newAccountRow = renderAccount(updatedAccount)
+
+      const sortedAccounts = getSnapshot()
+        .accounts
+        .toSorted((a, b) => accountValue(b) - accountValue(a))
+      const accountIndex = sortedAccounts.findIndex(a => a.id === account.id)
+      const prevAccountId = sortedAccounts.at(accountIndex + 1)?.id
+      const prevAccountRow = accountRows.get(prevAccountId)
+
+      if (prevAccountRow) {
+        $('#accounts').insertBefore(newAccountRow, prevAccountRow)
+      } else {
+        accountRow.nextSibling.after(newAccountRow)
+      }
+      $('#accounts').removeChild(accountRow)
+
+      accountRows.set(account.id, newAccountRow)
     }
   )
 
@@ -372,14 +413,21 @@ function renderAccountHistory(account) {
   return modal
 }
 
+
 function renderAccounts() {
-  const accountsUI = getSnapshot()
+  const sortedAccounts = getSnapshot()
     .accounts
-    .sort((a, b) => accountValue(b) - accountValue(a))
-    .map(renderAccount)
+    .toSorted((a, b) => accountValue(b) - accountValue(a))
+  let accountUIs = []
+
+  for (const account of sortedAccounts) {
+    const accountUI = renderAccount(account)
+    accountRows.set(account.id, accountUI)
+    accountUIs.push(accountUI)
+  }
 
   $('#accounts').innerHTML = ''
-  $('#accounts').append(...accountsUI)
+  $('#accounts').append(...accountUIs)
 }
 
 function presentModal(node) {
