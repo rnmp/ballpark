@@ -333,6 +333,11 @@ function renderAccount(account) {
 
   const chart = dotChart(historyValues, { size: 2, maxCount: 30 })
   chart.className = chart.className.concat(' mr-6 bounce')
+  chart.style.maxWidth = chart.style.width
+  chart.style.width = ''
+  chart.style.overflow = 'hidden'
+  chart.style.flex = '1'
+
   chart.onclick = () => {
     const accountHistory = renderAccountHistory(account)
     presentModal(accountHistory)
