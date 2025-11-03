@@ -46,8 +46,7 @@ export function deltaToggle(node, delta) {
 
 export function dotChart(values, { size, maxCount } = { size: 2, maxCount: 20 }) {
   const chart = make('div')
-  chart.className = 'flex items-end justify-end relative'
-  chart.style.gap = `2px`
+  chart.className = 'relative'
   chart.style.width = `${size * maxCount + 2 * (maxCount - 1)}px`
   chart.style.height = `${size * 10 + 2 * 9}px`
   const max = Math.max(...values)
@@ -60,23 +59,32 @@ export function dotChart(values, { size, maxCount } = { size: 2, maxCount: 20 })
     dot.style.borderRadius = '0.75px'
     dot.style.height = `${size}px`
     dot.style.background = 'currentColor'
+    dot.style.position = 'absolute'
+    dot.style.bottom = '0'
     return dot
   }
 
   const chartShadow = make('div')
-  chartShadow.className = 'flex items-end justify-end gap-0.5 absolute'
+  chartShadow.className = 'absolute'
+  chartShadow.style.width = '100%'
+  chartShadow.style.height = '100%'
   chart.append(chartShadow)
 
   for (let i = 0; i < maxCount; i++) {
     const bar = make('div')
-    bar.className = 'flex flex-column justify-end gap-0.5'
+    bar.className = 'absolute'
     bar.style.color = 'var(--text-color)'
+    bar.style.width = `${size}px`
+    bar.style.height = `100%`
+    bar.style.right = '0'
+    bar.style.bottom = '0'
+    bar.style.transform = `translateX(-${(maxCount - 1 - i) * (size + 2)}px)`
     for (let i = 0; i < 10; i++) {
       const dot = makeDot()
       dot.style.opacity = 0.15
+      dot.style.transform = `translateY(-${i * (size + 2)}px)`
       bar.append(dot)
     }
-    bar.style.height = `100%`
     chartShadow.append(bar)
   }
 
@@ -87,14 +95,20 @@ export function dotChart(values, { size, maxCount } = { size: 2, maxCount: 20 })
   for (let i = 0; i < graphValues.length; i++) {
     const value = graphValues[i]
     const bar = make('div')
-    bar.className = 'flex flex-column justify-end gap-0.5 relative'
+    bar.className = 'absolute'
     bar.style.color = 'var(--text-color)'
+    bar.style.width = `${size}px`
+    bar.style.height = `100%`
+    bar.style.right = '0'
+    bar.style.bottom = '0'
+    bar.style.transform = `translateX(-${(graphValues.length - 1 - i) * (size + 2)}px)`
     const percentage = value / (max - min) * 10
     const dots = Math.round(percentage) || 1
     for (let i = 0; i < dots; i++) {
-      bar.append(makeDot())
+      const dot = makeDot()
+      dot.style.transform = `translateY(-${i * (size + 2)}px)`
+      bar.append(dot)
     }
-    bar.style.height = `100%`
     bar.onmouseover = () => {
       if (!barMouseOverHandler) {
         return
