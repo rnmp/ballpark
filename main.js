@@ -1,6 +1,6 @@
 import { accountEmoji, accountValue, getAccountDisplay, getAccountDisplays, isLiability, realValue, ascHistory, descHistory } from './accounts.js'
 import { money, sanitizeMoneyInput } from './money.js'
-import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData, getAccount, empty, isOnboarded, finishOnboarding, resetOnboarding, replaceBalance } from './data.js'
+import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData, getAccount, empty, isOnboarded, finishOnboarding, resetOnboarding, replaceBalance, deleteBalance } from './data.js'
 import { $, make } from './dom.js'
 import { editableText, deltaToggle, dotChart } from './components.js'
 import { delta } from './timeseries.js'
@@ -193,6 +193,7 @@ function closeActiveModal() {
 modalOverlay.addEventListener('click', () => {
   closeActiveModal()
 })
+
 function renderTotal() {
   const total = getSnapshot()
     .accounts
@@ -416,6 +417,18 @@ function renderAccountHistory(account) {
   const deltaToggles = new Map()
 
   function populateDeltas(history) {
+    if (history.length === 1) {
+      const listItem = ul.children[0]
+      if (!listItem) {
+        return
+      }
+      const existingDelta = deltaToggles.get(history[0].timestamp)
+      if (!existingDelta) {
+        return
+      }
+      listItem.removeChild(existingDelta)
+      return
+    }
     for (let i = 0; i < history.length; i++) {
       const listItem = ul.children[i]
       if (!listItem) {
@@ -454,6 +467,36 @@ function renderAccountHistory(account) {
     if (i === 0) {
       li.classList.remove('border-t-0.5')
     }
+
+    const deleteButton = make('button')
+    li.deleteButton = deleteButton
+    deleteButton.textContent = 'Delete'
+    deleteButton.onclick = () => {
+      ul.removeChild(li)
+
+      const updatedAccount = deleteBalance({ timestamp: history.timestamp, accountId: account.id })
+
+      let newChart = makeChart(updatedAccount.history)
+      chartContainer.replaceChild(newChart, chart)
+      chart = newChart
+
+      populateDeltas(descHistory(updatedAccount.history))
+
+      document.dispatchEvent(new CustomEvent('account-balance-changed', {
+        detail: { updatedAccount }
+      }))
+
+      if (updatedAccount.history.length === 1) {
+        for (const child of ul.children) {
+          child.removeChild(child.deleteButton)
+        }
+      }
+    }
+
+    if (orderedHistory.length > 1) {
+      li.append(deleteButton)
+    }
+
 
     const valueContainer = make('div')
     valueContainer.className = 'flex flex-column gap-1'

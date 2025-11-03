@@ -33,16 +33,13 @@ export function getHistoryCounts() {
 }
 
 export function commit(newData, opts = {}) {
-  if (!newData || newData === netWorthData) {
-    // Need to enforce in order to support history
-    throw 'nope'
-  }
-
-  if (opts.undoing) {
-    redos.push(netWorthData)
-  } else {
-    undos.push(netWorthData)
-    redos = []
+  if (newData !== netWorthData) {
+    if (opts.undoing) {
+      redos.push(netWorthData)
+    } else {
+      undos.push(netWorthData)
+      redos = []
+    }
   }
 
   localStorage.setItem("netWorth", JSON.stringify(newData))
@@ -104,6 +101,34 @@ export function replaceBalance({ timestamp, balance, accountId }) {
   if (updatingLastHistory) {
     snapshotAccount.value = balance
   }
+
+  commit(snapshot)
+
+  return snapshotAccount
+}
+
+export function deleteBalance({ timestamp, accountId }) {
+  const snapshot = getSnapshot()
+  const snapshotAccount = snapshot.accounts.find(a => a.id === accountId)
+  if (snapshotAccount.history.length === 1) {
+    // Do nothing, should always have one present
+    return snapshotAccount
+  }
+
+  snapshotAccount.history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+  const historyIndex = snapshotAccount.history.findIndex(h => h.timestamp === timestamp)
+  if (!snapshotAccount.history.at(historyIndex)) {
+    throw 'Invalid history entry'
+  }
+
+  const updatingLastHistory = historyIndex === 0
+  const prevHistory = snapshotAccount.history.at(historyIndex + 1)
+
+  if (updatingLastHistory && prevHistory) {
+    snapshotAccount.value = prevHistory.value
+  }
+
+  snapshotAccount.history = snapshotAccount.history.filter(h => h.timestamp !== timestamp)
 
   commit(snapshot)
 
