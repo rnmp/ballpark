@@ -1,6 +1,6 @@
-import { accountEmoji, accountValue, getAccountDisplay, getAccountDisplays, isLiability } from './accounts.js'
+import { accountEmoji, accountValue, getAccountDisplay, getAccountDisplays, isLiability, realValue, ascHistory, descHistory } from './accounts.js'
 import { money, sanitizeMoneyInput } from './money.js'
-import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData, getAccount, empty, isOnboarded, finishOnboarding, resetOnboarding } from './data.js'
+import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData, getAccount, empty, isOnboarded, finishOnboarding, resetOnboarding, replaceBalance } from './data.js'
 import { $, make } from './dom.js'
 import { editableText, deltaToggle, dotChart } from './components.js'
 import { delta } from './timeseries.js'
@@ -131,7 +131,7 @@ function validateImport(jsonString) {
   return JSON.parse(jsonString)
 }
 
-$('#import_data_file_picker').addEventListener('change', async (event) => {
+$('#import_data_file_picker').addEventListener('change', async () => {
   const selectedFile = $('#import_data_file_picker').files[0]
   if (!selectedFile) {
     alert('Something went wrong!!!!')
@@ -286,7 +286,6 @@ function renderAccount(account) {
       commit(snapshot)
       account.name = newName
 
-      // We don't need to render everything
       renderToolbar()
     }
   )
@@ -309,9 +308,7 @@ function renderAccount(account) {
         return
       }
 
-      renderToolbar()
       document.dispatchEvent(new CustomEvent('account-balance-changed', {
-        bubbles: true,
         detail: { updatedAccount }
       }))
     }
@@ -321,7 +318,10 @@ function renderAccount(account) {
   options.className = 'flex flex-1 justify-end items-end'
   wrapper.append(options)
 
-  const historyValues = account.history.map(h => h.value).slice(-30)
+  const orderedHistory = account.history.toSorted(
+    (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
+  )
+  const historyValues = orderedHistory.map(h => h.value).slice(-30)
   const [b, a] = historyValues.slice(-2)
   if (a && b) {
     const button = make('button')
@@ -370,6 +370,7 @@ document.addEventListener('account-balance-changed', (e) => {
 
   accountRows.set(accountId, newAccountRow)
 
+  renderToolbar()
   renderTotal()
 })
 
@@ -378,12 +379,9 @@ function renderAccountHistory(account) {
   modal.className = 'modal'
   document.body.append(modal)
 
-  const historyValues = account.history.map(h => h.value).slice(-46)
   const chartContainer = make('div')
   chartContainer.className = 'px-4 py-4'
   modal.append(chartContainer)
-  const chart = dotChart(historyValues, { size: 6, maxCount: 46 })
-  chartContainer.append(chart)
 
   const ul = make('ul')
   ul.className = 'list-none border-t-0.5'
@@ -391,17 +389,66 @@ function renderAccountHistory(account) {
   ul.style.overflow = 'scroll'
   modal.append(ul)
 
-  const orderedHistory = account.history.toSorted(
-    (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-  )
+  const chartUlHandlers = {
+    mouseOver: (barIndex) => {
+      const item = ul.children[ul.children.length - 1 - barIndex]
+      if (!item) {
+        return
+      }
+      item.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
+      item.style.background = 'color-mix(in srgb, var(--text-color) 10%, transparent)'
+    },
+    mouseOut: () => {
+      for (const item of ul.children) {
+        item.style.background = ''
+      }
+    }
+  }
+
+  function makeChart(history) {
+    const historyValues = ascHistory(history).map(h => h.value).slice(-46)
+    const chart = dotChart(historyValues, { size: 6, maxCount: 46 })
+    chart.registerHandlers(chartUlHandlers)
+
+    return chart
+  }
+
+  const deltaToggles = new Map()
+
+  function populateDeltas(history) {
+    for (let i = 0; i < history.length; i++) {
+      const listItem = ul.children[i]
+      if (!listItem) {
+        continue
+      }
+
+      const historyItem = history.at(i)
+      const prevHistoryItem = history.at(i + 1)
+      if (!prevHistoryItem) {
+        continue;
+      }
+
+      const changeDisplay = make('button')
+      changeDisplay.className = 'bounce font-sm'
+
+      const existingDelta = deltaToggles.get(historyItem.timestamp)
+      if (existingDelta) {
+        listItem.replaceChild(changeDisplay, existingDelta)
+      } else {
+        listItem.append(changeDisplay)
+      }
+      deltaToggles.set(historyItem.timestamp, changeDisplay)
+
+      deltaToggle(changeDisplay, delta(historyItem.value, prevHistoryItem.value))
+    }
+  }
+
+  let chart = makeChart(account.history)
+  chartContainer.append(chart)
+
+  const orderedHistory = descHistory(account.history)
   for (let i = 0; i < orderedHistory.length; i++) {
     const history = orderedHistory.at(i)
-    const prevHistory = orderedHistory.at(i + 1)
-    let change = undefined
-    if (prevHistory) {
-      change = delta(history.value, prevHistory.value)
-    }
-
     const li = make('li')
     li.className = 'border-t-0.5 px-4 py-2 flex justify-between'
     if (i === 0) {
@@ -418,16 +465,35 @@ function renderAccountHistory(account) {
     time.textContent = history.timestamp.split('T')[0]
     valueContainer.append(time)
 
-    const balance = make('span')
-    balance.textContent = money(history.value)
-    valueContainer.append(balance)
+    const balance = make('p')
+    balance.style.marginLeft = '-4.5px'
+    editableText(
+      balance,
+      money(realValue({ value: history.value, liability: isLiability(account.account_type) })),
+      (newBalance) => {
+        const nextValue = sanitizeMoneyInput(newBalance)
 
-    if (change) {
-      const changeDisplay = make('button')
-      changeDisplay.className = 'bounce font-sm'
-      li.append(changeDisplay)
-      deltaToggle(changeDisplay, change)
-    }
+        let updatedAccount = undefined
+        if (account.value !== nextValue) {
+          updatedAccount = replaceBalance({ timestamp: history.timestamp, balance: nextValue, accountId: account.id })
+        }
+
+        if (!updatedAccount) {
+          return
+        }
+
+        let newChart = makeChart(updatedAccount.history)
+        chartContainer.replaceChild(newChart, chart)
+        chart = newChart
+
+        populateDeltas(descHistory(updatedAccount.history))
+
+        document.dispatchEvent(new CustomEvent('account-balance-changed', {
+          detail: { updatedAccount }
+        }))
+      }
+    )
+    valueContainer.append(balance)
 
     li.onmouseover = () => {
       chart.select(i)
@@ -444,21 +510,7 @@ function renderAccountHistory(account) {
     ul.append(li)
   }
 
-  chart.registerHandlers({
-    mouseOver: (barIndex) => {
-      const item = ul.children[ul.children.length - 1 - barIndex]
-      if (!item) {
-        return
-      }
-      item.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
-      item.style.background = 'color-mix(in srgb, var(--text-color) 10%, transparent)'
-    },
-    mouseOut: () => {
-      for (const item of ul.children) {
-        item.style.background = ''
-      }
-    }
-  })
+  populateDeltas(orderedHistory)
 
   return modal
 }

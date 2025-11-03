@@ -58,6 +58,17 @@ export function getAccountDisplays() {
 }
 
 export function accountValue(account) {
-  const factor = isLiability(account.account_type) && account.value > 0 ? -1 : +1
-  return (account.value * factor)
+  return realValue({ value: account.value, liability: isLiability(account.account_type) })
+}
+
+export function realValue({ value, liability }) {
+  const factor = liability > 0 ? -1 : +1
+  return (value * factor)
+}
+
+export function ascHistory(history) {
+  return history.toSorted((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+}
+export function descHistory(history) {
+  return history.toSorted((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
 }

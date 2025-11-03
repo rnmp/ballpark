@@ -85,6 +85,31 @@ export function updateBalance({ balance, accountId }) {
   return snapshotAccount
 }
 
+export function replaceBalance({ timestamp, balance, accountId }) {
+  const snapshot = getSnapshot()
+  const snapshotAccount = snapshot.accounts.find(a => a.id === accountId)
+  snapshotAccount.history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+
+  const historyIndex = snapshotAccount.history.findIndex(h => h.timestamp === timestamp)
+  if (!snapshotAccount.history.at(historyIndex)) {
+    throw 'Invalid history entry'
+  }
+
+  snapshotAccount.history[historyIndex] = {
+    value: balance,
+    timestamp,
+  }
+
+  const updatingLastHistory = historyIndex === 0
+  if (updatingLastHistory) {
+    snapshotAccount.value = balance
+  }
+
+  commit(snapshot)
+
+  return snapshotAccount
+}
+
 export function undo() {
   const snapshot = undos.pop()
   commit(snapshot, { undoing: true })
