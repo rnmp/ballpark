@@ -26,9 +26,9 @@ export function editableText(node, text, save) {
 let deltaToggleMode = localStorage.getItem('deltaToggleMode') || 'value'
 
 export function deltaToggle(node, delta) {
-  const value = money(delta.value)
-  const decoration = (value.startsWith('-') ? '' : '+')
-  const percentage = `${Math.ceil(delta.percentage * 100 * 10) / 10}%`
+  const value = money(Math.abs(delta.value))
+  const decoration = (delta.value.toString().startsWith('-') ? '-' : '+')
+  const percentage = `${Math.ceil(Math.abs(delta.percentage) * 100 * 10) / 10}%`
   const type = 'delta_toggle'
 
   node.dataset.component = type

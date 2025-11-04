@@ -352,13 +352,14 @@ function renderAccount(account) {
   )
   const historyValues = orderedHistory.map(h => h.value).slice(-30)
   const [b, a] = historyValues.slice(-2)
-  if (a && b) {
-    const button = make('button')
-    button.className = 'bounce font-sm mr-4'
-    options.append(button)
+  const button = make('button')
+  button.className = 'bounce font-sm mr-4'
+  options.append(button)
 
-    deltaToggle(button, delta(a, b))
-  }
+  deltaToggle(
+    button, 
+    a && b ? delta(a, b) : { value: accountValue(account), percentage: 1 }
+  )
 
   const chart = dotChart(historyValues, { size: 2, maxCount: 30 })
   chart.className = chart.className.concat(' mr-6 bounce')
