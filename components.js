@@ -18,6 +18,8 @@ export function editableText(node, text, save) {
   return node
 }
 
+let deltaToggleMode = localStorage.getItem('deltaToggleMode') || 'value'
+
 export function deltaToggle(node, delta) {
   const value = money(delta.value)
   const decoration = (value.startsWith('-') ? '' : '+')
@@ -28,12 +30,15 @@ export function deltaToggle(node, delta) {
   node.dataset.value = decoration + value
   node.dataset.percentage = decoration + percentage
 
-  node.textContent = decoration + value
+  node.textContent = deltaToggleMode === 'percentage'
+    ? decoration + percentage
+    : decoration + value
 
   node.addEventListener('click', () => {
-    const nextValue = node.textContent === decoration + value ? 'percentage' : 'value'
+    deltaToggleMode = deltaToggleMode === 'percentage' ? 'value' : 'percentage'
+    localStorage.setItem('deltaToggleMode', deltaToggleMode)
     for (const component of document.querySelectorAll(`[data-component=${type}]`)) {
-      if (nextValue === 'percentage') {
+      if (deltaToggleMode === 'percentage') {
         component.textContent = component.dataset.percentage
       } else {
         component.textContent = component.dataset.value
