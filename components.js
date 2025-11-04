@@ -12,6 +12,11 @@ export function editableText(node, text, save) {
     }
     save(input.value)
   }
+  input.onkeydown = (event) => {
+    if (event.key === 'Enter') {
+      input.blur()
+    }
+  }
 
   node.replaceChildren(input)
 
