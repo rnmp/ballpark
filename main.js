@@ -380,10 +380,13 @@ document.addEventListener('account-balance-changed', (e) => {
 
   if (prevAccountRow) {
     accountsList.insertBefore(newAccountRow, prevAccountRow)
-  } else {
+    accountsList.removeChild(accountRow)
+  } else if (accountRow.nextSibling) {
     accountRow.nextSibling.after(newAccountRow)
+    accountsList.removeChild(accountRow)
+  } else {
+    accountsList.replaceChild(newAccountRow, accountRow)
   }
-  accountsList.removeChild(accountRow)
 
   accountRows.set(accountId, newAccountRow)
 
