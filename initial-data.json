@@ -4,7 +4,9 @@
       "name": "Student Loan",
       "account_type": "student_loan",
       "value": 68200,
-      "history": []
+      "history": [
+        { "timestamp": "2025-10-28", "value": 68200 }
+      ]
     },
     {
       "name": "401K",
@@ -21,25 +23,33 @@
       "name": "Emergency Fund",
       "account_type": "savings",
       "value": 40000,
-      "history": []
+      "history": [
+        { "timestamp": "2025-10-28", "value": 40000 }
+      ]
     },
     {
       "name": "Mortgage",
       "account_type": "mortgage",
       "value": 320000,
-      "history": []
+      "history": [
+        { "timestamp": "2025-10-28", "value": 320000 }
+      ]
     },
     {
       "name": "Car Loan",
       "account_type": "car_loan",
       "value": 12390,
-      "history": []
+      "history": [
+        { "timestamp": "2025-10-28", "value": 12390 }
+      ]
     },
     {
       "name": "House",
       "account_type": "property",
       "value": 400000,
-      "history": []
+      "history": [
+        { "timestamp": "2025-10-28", "value": 400000 }
+      ]
     }
   ]
 }
