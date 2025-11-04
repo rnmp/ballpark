@@ -62,7 +62,7 @@ export function accountValue(account) {
 }
 
 export function realValue({ value, liability }) {
-  const factor = liability > 0 ? -1 : +1
+  const factor = liability && (value > 0) ? -1 : +1
   return (value * factor)
 }
 
