@@ -151,3 +151,63 @@ export function dotChart(values, { size, maxCount } = { size: 2, maxCount: 20 })
 
   return chart
 }
+
+let activeMenu = undefined
+const closeMenu = () => {
+  if (!activeMenu) {
+    return
+  }
+  document.body.removeChild(activeMenu)
+  activeMenu = undefined
+}
+document.addEventListener('click', closeMenu)
+window.addEventListener('resize', closeMenu)
+
+export function menu(trigger, options) {
+  const show = () => {
+    activeMenu = make('div')
+    activeMenu.className = 'fixed'
+    activeMenu.style.width = '140px'
+    activeMenu.onclick = (event) => {
+      event.stopPropagation()
+    }
+
+    for (const option of options) {
+      const button = make('button')
+      button.className = 'button'
+      button.style.width = '140px'
+      button.style.textAlign = 'start'
+      button.textContent = option.label
+      button.onclick = () => {
+        option.action()
+      }
+      activeMenu.append(button)
+    }
+    const { y, x, width, height } = trigger.getBoundingClientRect()
+    activeMenu.style.transform = `translateY(${y + height / 2}px) translateX(${(x + width / 2) - 140}px)`
+    document.body.append(activeMenu)
+  }
+
+  trigger.onclick = (event) => {
+    event.stopPropagation()
+    if (!activeMenu) {
+      show()
+      return
+    }
+
+    closeMenu()
+  }
+
+  const observer = new MutationObserver(mutations => {
+    mutations.forEach(mutation => {
+      mutation.removedNodes.forEach(node => {
+        if (node.contains(trigger)) {
+          closeMenu()
+          observer.disconnect()
+        }
+      });
+    });
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+

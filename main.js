@@ -2,17 +2,30 @@ import { accountEmoji, accountValue, getAccountDisplay, getAccountDisplays, isLi
 import { money, sanitizeMoneyInput } from './money.js'
 import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData, getAccount, empty, isOnboarded, finishOnboarding, resetOnboarding, replaceBalance, deleteBalance } from './data.js'
 import { $, make } from './dom.js'
-import { editableText, deltaToggle, dotChart } from './components.js'
+import { editableText, deltaToggle, dotChart, menu } from './components.js'
 import { delta } from './timeseries.js'
 
-const modalOverlay = $('#modal_overlay')
+
+const settingsModal = $('#settings')
 const newAccountForm = $('#new_account_form')
 const welcomeMessage = $('#welcome_message')
-const accountsList = $('#accounts')
+const editAccount = $('#edit_account')
+
+const PERMANENT_MODALS = new Set([
+  settingsModal,
+  newAccountForm,
+  welcomeMessage,
+  editAccount
+])
+
+const modalOverlay = $('#modal_overlay')
 let activeModal = undefined;
+
 let activeAccount = undefined;
 let activeIcon = undefined;
+
 const accountRows = new Map()
+const accountsList = $('#accounts')
 
 $('#undo').addEventListener('click', () => {
   undo()
@@ -111,8 +124,7 @@ $('#settings_button').addEventListener('click', () => {
   const snapshot = getSnapshot()
   $('#currency_selector').value = snapshot.currency || 'USD'
 
-  const settings = $('#settings')
-  presentModal(settings)
+  presentModal(settingsModal)
 })
 
 $('#currency_selector').addEventListener('change', (e) => {
@@ -187,6 +199,11 @@ function closeActiveModal() {
   if (activeModal === welcomeMessage) {
     finishOnboarding()
   }
+
+  if (!PERMANENT_MODALS.has(activeModal)) {
+    document.body.removeChild(activeModal)
+  }
+
   activeModal = undefined
 }
 
@@ -251,7 +268,6 @@ function renderAccount(account) {
   icon.textContent = account.icon || accountEmoji(account.account_type)
   icon.onclick = () => {
     const snapshotAccount = getAccount(account.id)
-    const editAccount = $('#edit_account')
     const type = editAccount.querySelector('[data-account-type]')
     const { emoji } = getAccountDisplay(snapshotAccount.account_type)
     type.textContent = `${emoji} ${isLiability(snapshotAccount.account_type) ? 'Liability' : 'Asset'}`
@@ -414,19 +430,13 @@ function renderAccountHistory(account) {
     return chart
   }
 
-  const deltaToggles = new Map()
-
   function populateDeltas(history) {
     if (history.length === 1) {
       const listItem = ul.children[0]
       if (!listItem) {
         return
       }
-      const existingDelta = deltaToggles.get(history[0].timestamp)
-      if (!existingDelta) {
-        return
-      }
-      listItem.removeChild(existingDelta)
+      listItem.deltaPlaceholder.innerHTML = ''
       return
     }
     for (let i = 0; i < history.length; i++) {
@@ -441,18 +451,13 @@ function renderAccountHistory(account) {
         continue;
       }
 
+      listItem.deltaPlaceholder.innerHTML = ''
+
       const changeDisplay = make('button')
       changeDisplay.className = 'bounce font-sm'
-
-      const existingDelta = deltaToggles.get(historyItem.timestamp)
-      if (existingDelta) {
-        listItem.replaceChild(changeDisplay, existingDelta)
-      } else {
-        listItem.append(changeDisplay)
-      }
-      deltaToggles.set(historyItem.timestamp, changeDisplay)
-
       deltaToggle(changeDisplay, delta(historyItem.value, prevHistoryItem.value))
+
+      listItem.deltaPlaceholder.append(changeDisplay)
     }
   }
 
@@ -463,43 +468,13 @@ function renderAccountHistory(account) {
   for (let i = 0; i < orderedHistory.length; i++) {
     const history = orderedHistory.at(i)
     const li = make('li')
-    li.className = 'border-t-0.5 px-4 py-2 flex justify-between'
+    li.className = 'border-t-0.5 px-4 py-2 flex items-center justify-between'
     if (i === 0) {
       li.classList.remove('border-t-0.5')
     }
 
-    const deleteButton = make('button')
-    li.deleteButton = deleteButton
-    deleteButton.textContent = 'Delete'
-    deleteButton.onclick = () => {
-      ul.removeChild(li)
-
-      const updatedAccount = deleteBalance({ timestamp: history.timestamp, accountId: account.id })
-
-      let newChart = makeChart(updatedAccount.history)
-      chartContainer.replaceChild(newChart, chart)
-      chart = newChart
-
-      populateDeltas(descHistory(updatedAccount.history))
-
-      document.dispatchEvent(new CustomEvent('account-balance-changed', {
-        detail: { updatedAccount }
-      }))
-
-      if (updatedAccount.history.length === 1) {
-        for (const child of ul.children) {
-          child.removeChild(child.deleteButton)
-        }
-      }
-    }
-
-    if (orderedHistory.length > 1) {
-      li.append(deleteButton)
-    }
-
-
     const valueContainer = make('div')
-    valueContainer.className = 'flex flex-column gap-1'
+    valueContainer.className = 'flex flex-column gap-1 flex-1'
     li.append(valueContainer)
 
     const time = make('time')
@@ -508,35 +483,81 @@ function renderAccountHistory(account) {
     time.textContent = history.timestamp.split('T')[0]
     valueContainer.append(time)
 
-    const balance = make('p')
-    balance.style.marginLeft = '-4.5px'
-    editableText(
-      balance,
-      money(realValue({ value: history.value, liability: isLiability(account.account_type) })),
-      (newBalance) => {
-        const nextValue = sanitizeMoneyInput(newBalance)
+    function makeBalance({ value, liability }) {
+      const balance = make('p')
+      balance.style.marginLeft = '-4.5px'
+      editableText(
+        balance,
+        money(realValue({ value, liability })),
+        (newBalance) => {
+          const nextValue = sanitizeMoneyInput(newBalance)
 
-        let updatedAccount = undefined
-        if (account.value !== nextValue) {
-          updatedAccount = replaceBalance({ timestamp: history.timestamp, balance: nextValue, accountId: account.id })
+          let updatedAccount = undefined
+          if (account.value !== nextValue) {
+            updatedAccount = replaceBalance({ timestamp: history.timestamp, balance: nextValue, accountId: account.id })
+          }
+
+          if (!updatedAccount) {
+            return
+          }
+
+          valueContainer.replaceChild(makeBalance({ value: nextValue, liability }), balance)
+
+          let newChart = makeChart(updatedAccount.history)
+          chartContainer.replaceChild(newChart, chart)
+          chart = newChart
+
+          populateDeltas(descHistory(updatedAccount.history))
+
+          document.dispatchEvent(new CustomEvent('account-balance-changed', {
+            detail: { updatedAccount }
+          }))
         }
+      )
+      return balance
+    }
 
-        if (!updatedAccount) {
-          return
+    valueContainer.append(makeBalance({ value: history.value, liability: isLiability(account.account_type) }))
+
+    const deltaPlaceholder = make('div')
+    li.deltaPlaceholder = deltaPlaceholder
+    li.append(deltaPlaceholder)
+
+    const historyMenu = make('button')
+    historyMenu.className = 'button ml-4'
+    historyMenu.textContent = '…'
+    li.historyMenu = historyMenu
+
+    menu(historyMenu, [
+      {
+        label: 'Delete',
+        action: () => {
+          ul.removeChild(li)
+
+          const updatedAccount = deleteBalance({ timestamp: history.timestamp, accountId: account.id })
+
+          let newChart = makeChart(updatedAccount.history)
+          chartContainer.replaceChild(newChart, chart)
+          chart = newChart
+
+          populateDeltas(descHistory(updatedAccount.history))
+
+          document.dispatchEvent(new CustomEvent('account-balance-changed', {
+            detail: { updatedAccount }
+          }))
+
+          if (updatedAccount.history.length === 1) {
+            for (const child of ul.children) {
+              child.removeChild(child.historyMenu)
+            }
+          }
         }
-
-        let newChart = makeChart(updatedAccount.history)
-        chartContainer.replaceChild(newChart, chart)
-        chart = newChart
-
-        populateDeltas(descHistory(updatedAccount.history))
-
-        document.dispatchEvent(new CustomEvent('account-balance-changed', {
-          detail: { updatedAccount }
-        }))
       }
-    )
-    valueContainer.append(balance)
+    ])
+
+    if (orderedHistory.length > 1) {
+      li.append(historyMenu)
+    }
 
     li.onmouseover = () => {
       chart.select(i)
@@ -587,7 +608,7 @@ function welcomeUser() {
     return
   }
 
-  presentModal($('#welcome_message'))
+  presentModal(welcomeMessage)
 
   $('#start_fresh').addEventListener('click', () => {
     empty()
