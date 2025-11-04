@@ -6,12 +6,12 @@ export function editableText(node, text, save) {
 
   const input = make('input')
   input.value = text
-  input.addEventListener('blur', () => {
+  input.onblur = () => {
     if (input.value === text) {
       return
     }
     save(input.value)
-  })
+  }
 
   node.replaceChildren(input)
 
@@ -34,7 +34,7 @@ export function deltaToggle(node, delta) {
     ? decoration + percentage
     : decoration + value
 
-  node.addEventListener('click', () => {
+  node.onclick = () => {
     deltaToggleMode = deltaToggleMode === 'percentage' ? 'value' : 'percentage'
     localStorage.setItem('deltaToggleMode', deltaToggleMode)
     for (const component of document.querySelectorAll(`[data-component=${type}]`)) {
@@ -44,7 +44,7 @@ export function deltaToggle(node, delta) {
         component.textContent = component.dataset.value
       }
     }
-  })
+  }
 
   return node
 }
