@@ -157,6 +157,9 @@ const closeMenu = () => {
   if (!activeMenu) {
     return
   }
+  if (activeMenu.cleanup) {
+    activeMenu.cleanup()
+  }
   document.body.removeChild(activeMenu)
   activeMenu = undefined
 }
@@ -185,6 +188,20 @@ export function menu(trigger, options) {
     }
     const { y, x, width, height } = trigger.getBoundingClientRect()
     activeMenu.style.transform = `translateY(${y + height / 2}px) translateX(${(x + width / 2) - 140}px)`
+
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        mutation.removedNodes.forEach(node => {
+          if (node.contains(trigger)) {
+            closeMenu()
+          }
+        });
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    activeMenu.cleanup = () => observer.disconnect()
+
     document.body.append(activeMenu)
   }
 
@@ -197,17 +214,5 @@ export function menu(trigger, options) {
 
     closeMenu()
   }
-
-  const observer = new MutationObserver(mutations => {
-    mutations.forEach(mutation => {
-      mutation.removedNodes.forEach(node => {
-        if (node.contains(trigger)) {
-          closeMenu()
-          observer.disconnect()
-        }
-      });
-    });
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
 }
 
