@@ -609,17 +609,17 @@ function welcomeUser() {
   }
 
   presentModal(welcomeMessage)
-
-  $('#start_fresh').addEventListener('click', () => {
-    empty()
-    renderEverything()
-    closeActiveModal()
-  })
-
-  $('#demo_mode').addEventListener('click', () => {
-    closeActiveModal()
-  })
 }
+
+$('#start_fresh').addEventListener('click', () => {
+  empty()
+  renderEverything()
+  closeActiveModal()
+})
+
+$('#demo_mode').addEventListener('click', () => {
+  closeActiveModal()
+})
 
 function initialize() {
   welcomeUser()
