@@ -214,6 +214,13 @@ input, button, select, textarea {
 .pt-5 { padding-top: 1.25rem; }
 .pt-6 { padding-top: 1.5rem; }
 
+.pb-1 { padding-bottom: 0.25rem; }
+.pb-2 { padding-bottom: 0.50rem; }
+.pb-3 { padding-bottom: 0.75rem; }
+.pb-4 { padding-bottom: 1rem; }
+.pb-5 { padding-bottom: 1.25rem; }
+.pb-6 { padding-bottom: 1.5rem; }
+
 .tracking-wide { letter-spacing: 0.25em; }
 .uppercase     { text-transform: uppercase; }
 

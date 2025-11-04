@@ -502,6 +502,7 @@ function renderAccountHistory(account) {
     function makeBalance({ value, liability }) {
       const balance = make('p')
       balance.style.marginLeft = '-4.5px'
+      balance.style.marginBottom = '-2px'
       editableText(
         balance,
         money(realValue({ value, liability })),
