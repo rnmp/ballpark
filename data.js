@@ -136,11 +136,17 @@ export function deleteBalance({ timestamp, accountId }) {
 }
 
 export function undo() {
+  if (undos.length === 0) {
+    return
+  }
   const snapshot = undos.pop()
   commit(snapshot, { undoing: true })
 }
 
 export function redo() {
+  if (redos.length === 0) {
+    return
+  }
   const snapshot = redos.pop()
   commit(snapshot)
 }

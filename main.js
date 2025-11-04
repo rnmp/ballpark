@@ -37,6 +37,18 @@ $('#redo').addEventListener('click', () => {
   renderEverything()
 })
 
+document.addEventListener('keydown', (e) => {
+  if (e.metaKey && e.key === 'z') {
+    e.preventDefault()
+    if (e.shiftKey) {
+      redo()
+    } else {
+      undo()
+    }
+    renderEverything()
+  }
+})
+
 $('#new_account').addEventListener('click', () => {
   newAccountForm.querySelector('input[name="initial_value"]').setAttribute('placeholder', money(30000))
   newAccountForm.querySelector('input[value="savings"]').checked = true
