@@ -183,7 +183,6 @@ export function menu(trigger, options) {
     activeMenu.style.width = '140px'
     activeMenu.style.top = '0px'
     activeMenu.style.left = '0px'
-    activeMenu.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)'
     activeMenu.onclick = (event) => {
       event.stopPropagation()
     }
@@ -193,6 +192,7 @@ export function menu(trigger, options) {
       button.className = 'button'
       button.style.width = '140px'
       button.style.textAlign = 'start'
+      button.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)'
       button.textContent = option.label
       button.onclick = () => {
         option.action()
@@ -200,7 +200,7 @@ export function menu(trigger, options) {
       activeMenu.append(button)
     }
     const { y, x, width, height } = trigger.getBoundingClientRect()
-    activeMenu.style.transform = `translateY(${y + height}px) translateX(${(x + width) - 140}px)`
+    activeMenu.style.transform = `translateY(${y + height}px) translateX(${(x + width + 4) - 140}px)`
 
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
