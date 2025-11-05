@@ -56,6 +56,11 @@ input, button, select, textarea {
   color: unset;
 }
 
+a {
+  font: inherit;
+  color: inherit;
+}
+
 .button {
   user-select: none;
   -webkit-user-select: none;
@@ -138,6 +143,9 @@ input, button, select, textarea {
 .font-xl   { font-size: 1.25rem; }
 .font-2xl  { font-size: 1.5rem; }
 .font-3xl  { font-size: 1.875rem; }
+
+.text-right { text-align: right; }
+.text-center { text-align: center; }
 
 .w-full { width: 100%; }
 
