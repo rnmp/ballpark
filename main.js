@@ -412,6 +412,11 @@ function renderAccountHistory(account) {
   modal.className = 'modal'
   document.body.append(modal)
 
+  const title = make('h1')
+  title.className = 'pt-4 px-4'
+  title.textContent = `History for ${account.name}`
+  modal.append(title)
+
   const chartContainer = make('div')
   chartContainer.className = 'px-4 py-4'
   modal.append(chartContainer)
