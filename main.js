@@ -38,6 +38,10 @@ $('#redo').addEventListener('click', () => {
 })
 
 document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && activeModal && !(e.target instanceof HTMLInputElement)) {
+    closeActiveModal()
+    return
+  }
   if (e.metaKey && e.key === 'z') {
     e.preventDefault()
     if (e.shiftKey) {
