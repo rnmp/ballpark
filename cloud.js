@@ -1,4 +1,3 @@
-import { $, make } from './dom.js'
 import { getSnapshot, commit } from './data.js'
 
 // Don't get smart! Using this key doesn't give you anything other than unsafe
@@ -228,8 +227,8 @@ export function initializeCloud() {
 
   let checkedCloudStatusAt = undefined
 
-  async function checkCloudStatus() {
-    if (checkedCloudStatusAt && checkedCloudStatusAt.getTime() > new Date().getTime() - (60_000) || !cloudLocation) {
+  async function checkCloudStatus(opts = {}) {
+    if (!opts.force && checkedCloudStatusAt && checkedCloudStatusAt.getTime() > new Date().getTime() - (60_000) || !cloudLocation) {
       return
     }
 
@@ -248,22 +247,32 @@ export function initializeCloud() {
     const cloudUpdatedAt = new Date(cloudSnapshot.updatedAt)
 
     if (cloudUpdatedAt.getTime() === localUpdatedAt.getTime()) {
+      setCloudStatus('No changes detected')
+      await sleep(600)
       setCloudStatus(`All synced as of ${formatRelative(new Date())}`)
       return
     }
 
     if (cloudUpdatedAt > localUpdatedAt) {
       commit(cloudSnapshot, { cloudOverride: true })
+      setCloudStatus('Updated local data')
+      await sleep(600)
       setCloudStatus(`All synced as of ${formatRelative(new Date())}`)
       return
     }
 
     const { success } = await updateCloudState(cloudLocation, localSnapshot)
     if (success) {
+      setCloudStatus('Updated cloud data')
+      await sleep(600)
       setCloudStatus(`All synced as of ${formatRelative(new Date())}`)
     } else {
       setCloudStatus('Whoops…')
     }
+  }
+
+  $('#cloud_status').onclick = () => {
+    checkCloudStatus({ force: true })
   }
 
   checkCloudStatus()

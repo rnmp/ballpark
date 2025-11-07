@@ -1,4 +1,3 @@
-import { make } from './dom.js'
 import { money } from './money.js'
 
 export function editableText(node, text, save) {

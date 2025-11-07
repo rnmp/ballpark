@@ -1,8 +1,7 @@
 import { accountEmoji, accountValue, getAccountDisplay, getAccountDisplays, isLiability } from './accounts.js'
 import { money, sanitizeMoneyInput } from './money.js'
 import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData, getAccount, empty, isOnboarded, finishOnboarding, resetOnboarding } from './data.js'
-import { $, make } from './dom.js'
-import { editableText, deltaToggle, dotChart, menu } from './components.js'
+import { editableText, deltaToggle, dotChart } from './components.js'
 import { delta } from './timeseries.js'
 import { renderAccountHistory } from './accountHistory.js'
 import { initializeCloud } from './cloud.js'
@@ -248,7 +247,6 @@ function renderEverything() {
   renderToolbar()
 }
 
-const sleep = (num) => new Promise(resolve => setTimeout(resolve, num))
 
 $('#delete_account_button').addEventListener('click', async () => {
   if (!activeAccount) {

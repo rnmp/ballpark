@@ -1,7 +1,6 @@
 import { isLiability, realValue, ascHistory, descHistory } from './accounts.js'
 import { money, sanitizeMoneyInput } from './money.js'
-import { updateBalance, getAccount, replaceBalance, deleteBalance } from './data.js'
-import { $, make } from './dom.js'
+import { replaceBalance, deleteBalance } from './data.js'
 import { editableText, deltaToggle, dotChart, menu } from './components.js'
 import { delta } from './timeseries.js'
 
