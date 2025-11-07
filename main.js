@@ -1,6 +1,6 @@
-import { accountEmoji, accountValue, getAccountDisplay, getAccountDisplays, isLiability, realValue, ascHistory, descHistory } from './accounts.js'
+import { accountEmoji, accountValue, getAccountDisplay, getAccountDisplays, isLiability } from './accounts.js'
 import { money, sanitizeMoneyInput } from './money.js'
-import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData, getAccount, empty, isOnboarded, finishOnboarding, resetOnboarding, replaceBalance, deleteBalance } from './data.js'
+import { commit, createAccount, updateBalance, getSnapshot, undo, redo, getHistoryCounts, resetData, getAccount, empty, isOnboarded, finishOnboarding, resetOnboarding } from './data.js'
 import { $, make } from './dom.js'
 import { editableText, deltaToggle, dotChart, menu } from './components.js'
 import { delta } from './timeseries.js'
@@ -248,8 +248,6 @@ function renderEverything() {
   renderToolbar()
 }
 
-
-
 const sleep = (num) => new Promise(resolve => setTimeout(resolve, num))
 
 $('#delete_account_button').addEventListener('click', async () => {
@@ -451,6 +449,10 @@ $('#start_fresh').addEventListener('click', () => {
 
 $('#demo_mode').addEventListener('click', () => {
   closeActiveModal()
+})
+
+document.addEventListener('cloud-override', () => {
+  renderEverything()
 })
 
 function initialize() {

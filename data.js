@@ -48,7 +48,9 @@ export function commit(newData, opts = {}) {
   localStorage.setItem("netWorth", JSON.stringify(newData))
   netWorthData = newData
 
-  if (!opts.cloudOverride) {
+  if (opts.cloudOverride) {
+    document.dispatchEvent(new CustomEvent('cloud-override'))
+  } else {
     document.dispatchEvent(new CustomEvent('data-committed'))
   }
 }
