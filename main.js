@@ -5,6 +5,7 @@ import { $, make } from './dom.js'
 import { editableText, deltaToggle, dotChart, menu } from './components.js'
 import { delta } from './timeseries.js'
 import { renderAccountHistory } from './accountHistory.js'
+import { initializeCloud } from './cloud.js'
 
 const settingsModal = $('#settings')
 const newAccountForm = $('#new_account_form')
@@ -361,7 +362,7 @@ function renderAccount(account) {
   options.append(button)
 
   deltaToggle(
-    button, 
+    button,
     a && b ? delta(a, b) : { value: accountValue(account), percentage: 1 }
   )
 
@@ -457,5 +458,6 @@ function initialize() {
   populateAccountTypeSelector()
   populateAccountEmojiSelector()
   renderEverything()
+  initializeCloud()
 }
 initialize()

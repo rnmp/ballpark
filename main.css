@@ -134,6 +134,7 @@ a {
 
 .rounded-full { border-radius: 100% }
 
+.leading-4 { line-height: 1rem; }
 .leading-5 { line-height: 1.25rem; }
 .leading-6 { line-height: 1.5rem; }
 
@@ -170,6 +171,15 @@ a {
 .ml-4 { margin-left: 1rem; }
 .ml-5 { margin-left: 1.25rem; }
 .ml-6 { margin-left: 1.5rem; }
+
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.50rem; }
+.mt-3 { margin-top: 0.75rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-5 { margin-top: 1.25rem; }
+.mt-6 { margin-top: 1.5rem; }
+.mt-7 { margin-top: 1.75rem; }
+.mt-8 { margin-top: 2.0rem; }
 
 .mb-1 { margin-bottom: 0.25rem; }
 .mb-2 { margin-bottom: 0.50rem; }

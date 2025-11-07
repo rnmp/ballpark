@@ -1,7 +1,7 @@
 import INITIAL_DATA from './initial-data.json' with { type: 'json' }
 
 const initialData = INITIAL_DATA
-initialData.accounts = initialData.accounts.map(a => ({ ...a, id: crypto.randomUUID(), history: a.history.length ? a.history : [produceHistory(a.value)] }))
+initialData.accounts = initialData.accounts.map(a => ({ ...a, id: crypto.randomUUID(), updatedAt: new Date().toISOString(), history: a.history.length ? a.history : [produceHistory(a.value)] }))
 
 let netWorthData = initialData
 try {
@@ -11,7 +11,6 @@ try {
   }
 } catch (e) {
 }
-Object.freeze(netWorthData)
 
 export function getSnapshot() {
   return JSON.parse(JSON.stringify(netWorthData))
@@ -42,10 +41,16 @@ export function commit(newData, opts = {}) {
     }
   }
 
+  if (!opts.cloudOverride) {
+    newData.updatedAt = new Date().toISOString()
+  }
+
   localStorage.setItem("netWorth", JSON.stringify(newData))
   netWorthData = newData
-  Object.freeze(netWorthData)
 
+  if (!opts.cloudOverride) {
+    document.dispatchEvent(new CustomEvent('data-committed'))
+  }
 }
 
 export function resetData() {
@@ -160,6 +165,8 @@ export function empty() {
   }))
   commit(snapshot)
 }
+
+window.getSnapshot = getSnapshot
 
 export function resetOnboarding() {
   localStorage.removeItem('onboarded')
