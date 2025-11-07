@@ -106,19 +106,6 @@ window.updateCloudState = (data) => updateCloudState(getCloudLocation(), data)
 window.createCloudState = (data) => createCloudState(getCloudLocation(), data)
 window.getCloudState = () => getCloudState(getCloudLocation())
 
-const formatRelative = (date, locale = 'en-US') => {
-  const now = Date.now()
-  const diffMs = now - date.getTime()
-  const absDiff = Math.abs(diffMs)
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
-  if (absDiff < 60000) return rtf.format(Math.round(diffMs / 1000), 'second')
-  if (absDiff < 3600000) return rtf.format(Math.round(diffMs / 60000), 'minute')
-  if (absDiff < 86400000) return rtf.format(Math.round(diffMs / 3600000), 'hour')
-  if (absDiff < 604800000) return rtf.format(Math.round(diffMs / 86400000), 'day')
-  if (absDiff < 2592000000) return rtf.format(Math.round(diffMs / 2592000000), 'month')
-  return rtf.format(Math.round(diffMs / 31536000000), 'year')
-}
-
 function setupConfigurationUI(cloudLocation) {
   const instructions = $('#cloud_instructions')
   const actions = $('#cloud_actions')
@@ -216,7 +203,7 @@ export function initializeCloud() {
     setCloudStatus('Syncing…')
     const { success } = await updateCloudState(cloudLocation, getSnapshot())
     if (success) {
-      setCloudStatus(`All synced as of ${formatRelative(new Date())}`)
+      setCloudStatus('')
     } else {
       setCloudStatus('Whoops…')
     }
@@ -248,24 +235,24 @@ export function initializeCloud() {
 
     if (cloudUpdatedAt.getTime() === localUpdatedAt.getTime()) {
       setCloudStatus('No changes detected')
-      await sleep(600)
-      setCloudStatus(`All synced as of ${formatRelative(new Date())}`)
+      await sleep(1000)
+      setCloudStatus('')
       return
     }
 
     if (cloudUpdatedAt > localUpdatedAt) {
       commit(cloudSnapshot, { cloudOverride: true })
       setCloudStatus('Updated local data')
-      await sleep(600)
-      setCloudStatus(`All synced as of ${formatRelative(new Date())}`)
+      await sleep(1000)
+      setCloudStatus('')
       return
     }
 
     const { success } = await updateCloudState(cloudLocation, localSnapshot)
     if (success) {
       setCloudStatus('Updated cloud data')
-      await sleep(600)
-      setCloudStatus(`All synced as of ${formatRelative(new Date())}`)
+      await sleep(1000)
+      setCloudStatus('')
     } else {
       setCloudStatus('Whoops…')
     }
