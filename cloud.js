@@ -226,49 +226,43 @@ export function initializeCloud() {
   const cloudLocation = getCloudLocation()
   setupConfigurationUI(cloudLocation)
 
-  let checkingCloudStatus = false
+  let checkedCloudStatusAt = undefined
 
   async function checkCloudStatus() {
-    if (checkingCloudStatus || !cloudLocation) {
+    if (checkedCloudStatusAt && checkedCloudStatusAt.getTime() > new Date().getTime() - (60_000) || !cloudLocation) {
       return
     }
 
-    checkingCloudStatus = true
+    checkedCloudStatusAt = new Date()
 
-    try {
-      setCloudStatus('Syncing…')
-      const { error, data } = await getCloudState(cloudLocation)
-      if (error) {
-        setCloudStatus('Whoops…')
-        return
-      }
-
-      const localSnapshot = getSnapshot()
-      const localUpdatedAt = new Date(localSnapshot.updatedAt)
-      const cloudSnapshot = data.record
-      const cloudUpdatedAt = new Date(cloudSnapshot.updatedAt)
-
-      if (cloudUpdatedAt.getTime() === localUpdatedAt.getTime()) {
-        setCloudStatus(`All synced as of ${formatRelative(new Date())}`)
-        return
-      }
-
-      if (cloudUpdatedAt > localUpdatedAt) {
-        commit(cloudSnapshot, { cloudOverride: true })
-        setCloudStatus(`All synced as of ${formatRelative(new Date())}`)
-        return
-      }
-
-      const { success } = await updateCloudState(cloudLocation, localSnapshot)
-      if (success) {
-        setCloudStatus(`All synced as of ${formatRelative(new Date())}`)
-      } else {
-        setCloudStatus('Whoops…')
-      }
-    } catch (_) {
+    setCloudStatus('Syncing…')
+    const { error, data } = await getCloudState(cloudLocation)
+    if (error) {
       setCloudStatus('Whoops…')
-    } finally {
-      checkingCloudStatus = false
+      return
+    }
+
+    const localSnapshot = getSnapshot()
+    const localUpdatedAt = new Date(localSnapshot.updatedAt)
+    const cloudSnapshot = data.record
+    const cloudUpdatedAt = new Date(cloudSnapshot.updatedAt)
+
+    if (cloudUpdatedAt.getTime() === localUpdatedAt.getTime()) {
+      setCloudStatus(`All synced as of ${formatRelative(new Date())}`)
+      return
+    }
+
+    if (cloudUpdatedAt > localUpdatedAt) {
+      commit(cloudSnapshot, { cloudOverride: true })
+      setCloudStatus(`All synced as of ${formatRelative(new Date())}`)
+      return
+    }
+
+    const { success } = await updateCloudState(cloudLocation, localSnapshot)
+    if (success) {
+      setCloudStatus(`All synced as of ${formatRelative(new Date())}`)
+    } else {
+      setCloudStatus('Whoops…')
     }
   }
 
