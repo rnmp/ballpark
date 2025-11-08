@@ -368,3 +368,12 @@ ul {
   background-color: var(--text-color);
   color: var(--background-color);
 }
+
+@media (max-width: 820px) {
+  html {
+    padding: 1rem 0.85rem 1rem;
+  }
+  main {
+    border-radius: 1.5rem;
+  }
+}

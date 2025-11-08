@@ -193,7 +193,7 @@ $('#reset_data_button').addEventListener('click', () => {
 })
 
 newAccountForm.addEventListener('submit', (e) => {
-  e.preventDefault();
+  e.preventDefault()
   const form = e.target
   const data = new FormData(form)
 
@@ -278,6 +278,7 @@ function renderAccount(account) {
 
   const icon = make('div')
   icon.className = 'button p-0 font-lg size-10 flex items-center justify-center rounded-full'
+  icon.style.flexShrink = '0'
   icon.textContent = account.icon || accountEmoji(account.account_type)
   icon.onclick = () => {
     const snapshotAccount = getAccount(account.id)
@@ -452,6 +453,14 @@ $('#demo_mode').addEventListener('click', () => {
 document.addEventListener('cloud-override', () => {
   renderEverything()
 })
+
+const setThemeColor = () => {
+  const color = window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? '#000000' : '#ffffff'
+  document.querySelector('meta[name="theme-color"]').content = color
+}
+setThemeColor()
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', setThemeColor)
 
 function initialize() {
   welcomeUser()
