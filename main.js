@@ -231,7 +231,58 @@ function renderTotal() {
   const total = getSnapshot()
     .accounts
     .reduce((total, account) => total + accountValue(account), 0)
-  $('#total').textContent = money(total)
+  transitionFigure($('#total'), money(total))
+}
+
+async function transitionFigure(node, newFigure) {
+  node.style.position = 'relative'
+  const number = node.textContent.toString()
+  node.innerHTML = ''
+
+  const transitionContainer = document.createElement('span')
+  node.append(transitionContainer)
+
+  const targetNumber = newFigure
+  const transitionDoppleganger = document.createElement('span')
+  transitionDoppleganger.style.position = 'absolute'
+  transitionDoppleganger.style.left = '0'
+  node.append(transitionDoppleganger)
+
+  const speed = Math.round(300 / targetNumber.length)
+
+  for (let i = 0; i < number.length; i++) {
+    const subNumber = document.createElement('span')
+    subNumber.style.display = 'inline-block'
+    subNumber.style.transition = 'all 0.2s ease-in-out'
+    const char = number[i]
+    subNumber.textContent = char
+    transitionContainer.append(subNumber)
+
+    setTimeout(() => {
+      subNumber.style.transform = 'translateY(-50%) scale(0.2)'
+      subNumber.style.opacity = 0
+    }, speed * i + 1)
+  }
+
+  for (let i = 0; i < targetNumber.length; i++) {
+    const subNumber = document.createElement('span')
+    subNumber.style.display = 'inline-block'
+    subNumber.style.transition = 'all 0.2s ease-in-out'
+    subNumber.style.transform = 'translateY(50%) scale(0.2)'
+    subNumber.style.opacity = 0
+    const char = targetNumber[i]
+    subNumber.textContent = char
+    transitionDoppleganger.append(subNumber)
+
+    setTimeout(() => {
+      subNumber.style.transform = 'translateY(0%) scale(1.0)'
+      subNumber.style.opacity = 1
+    }, speed * i + 1)
+  }
+
+  await sleep((targetNumber.length + number.length) * speed)
+
+  node.textContent = newFigure
 }
 
 function renderToolbar() {
