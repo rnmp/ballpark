@@ -3,9 +3,18 @@
     {
       "name": "Student Loan",
       "account_type": "student_loan",
-      "value": 68200,
+      "value": 62300,
       "history": [
-        { "timestamp": "2025-10-28", "value": 68200 }
+        { "timestamp": "2025-04-01", "value": 67800 },
+        { "timestamp": "2025-05-01", "value": 67300 },
+        { "timestamp": "2025-06-01", "value": 66800 },
+        { "timestamp": "2025-07-01", "value": 66300 },
+        { "timestamp": "2025-08-01", "value": 65800 },
+        { "timestamp": "2025-09-01", "value": 65300 },
+        { "timestamp": "2025-10-01", "value": 64800 },
+        { "timestamp": "2025-10-15", "value": 64300 },
+        { "timestamp": "2025-11-01", "value": 63800 },
+        { "timestamp": "2025-11-10", "value": 62300 }
       ]
     },
     {
@@ -13,10 +22,20 @@
       "account_type": "investments",
       "value": 30000,
       "history": [
-        { "timestamp": "2025-10-28", "value": 30000 },
-        { "timestamp": "2025-10-27", "value": 28000 },
-        { "timestamp": "2025-10-26", "value": 26000 },
-        { "timestamp": "2025-10-25", "value": 40000 }
+        { "timestamp": "2025-04-01", "value": 24500 },
+        { "timestamp": "2025-05-01", "value": 25200 },
+        { "timestamp": "2025-05-15", "value": 24800 },
+        { "timestamp": "2025-06-01", "value": 25500 },
+        { "timestamp": "2025-07-01", "value": 26800 },
+        { "timestamp": "2025-07-15", "value": 27200 },
+        { "timestamp": "2025-08-01", "value": 26900 },
+        { "timestamp": "2025-08-15", "value": 27400 },
+        { "timestamp": "2025-09-01", "value": 28100 },
+        { "timestamp": "2025-09-15", "value": 27800 },
+        { "timestamp": "2025-10-01", "value": 28900 },
+        { "timestamp": "2025-10-15", "value": 29500 },
+        { "timestamp": "2025-11-01", "value": 29800 },
+        { "timestamp": "2025-11-10", "value": 30000 }
       ]
     },
     {
@@ -24,7 +43,17 @@
       "account_type": "savings",
       "value": 40000,
       "history": [
-        { "timestamp": "2025-10-28", "value": 40000 }
+        { "timestamp": "2025-04-01", "value": 42000 },
+        { "timestamp": "2025-05-01", "value": 42500 },
+        { "timestamp": "2025-05-20", "value": 39800 },
+        { "timestamp": "2025-06-01", "value": 40300 },
+        { "timestamp": "2025-07-01", "value": 40800 },
+        { "timestamp": "2025-08-01", "value": 41300 },
+        { "timestamp": "2025-08-15", "value": 36500 },
+        { "timestamp": "2025-09-01", "value": 37000 },
+        { "timestamp": "2025-10-01", "value": 38500 },
+        { "timestamp": "2025-11-01", "value": 39500 },
+        { "timestamp": "2025-11-10", "value": 40000 }
       ]
     },
     {
@@ -32,7 +61,15 @@
       "account_type": "mortgage",
       "value": 320000,
       "history": [
-        { "timestamp": "2025-10-28", "value": 320000 }
+        { "timestamp": "2025-04-01", "value": 323200 },
+        { "timestamp": "2025-05-01", "value": 322800 },
+        { "timestamp": "2025-06-01", "value": 322400 },
+        { "timestamp": "2025-07-01", "value": 322000 },
+        { "timestamp": "2025-08-01", "value": 321600 },
+        { "timestamp": "2025-09-01", "value": 321200 },
+        { "timestamp": "2025-10-01", "value": 320800 },
+        { "timestamp": "2025-11-01", "value": 320400 },
+        { "timestamp": "2025-11-10", "value": 320000 }
       ]
     },
     {
@@ -40,7 +77,15 @@
       "account_type": "car_loan",
       "value": 12390,
       "history": [
-        { "timestamp": "2025-10-28", "value": 12390 }
+        { "timestamp": "2025-04-01", "value": 14890 },
+        { "timestamp": "2025-05-01", "value": 14540 },
+        { "timestamp": "2025-06-01", "value": 14190 },
+        { "timestamp": "2025-07-01", "value": 13840 },
+        { "timestamp": "2025-08-01", "value": 13490 },
+        { "timestamp": "2025-09-01", "value": 13140 },
+        { "timestamp": "2025-10-01", "value": 12790 },
+        { "timestamp": "2025-11-01", "value": 12440 },
+        { "timestamp": "2025-11-10", "value": 12390 }
       ]
     },
     {
@@ -48,7 +93,15 @@
       "account_type": "property",
       "value": 400000,
       "history": [
-        { "timestamp": "2025-10-28", "value": 400000 }
+        { "timestamp": "2025-04-01", "value": 395000 },
+        { "timestamp": "2025-05-01", "value": 396000 },
+        { "timestamp": "2025-06-01", "value": 397000 },
+        { "timestamp": "2025-07-01", "value": 397500 },
+        { "timestamp": "2025-08-01", "value": 398000 },
+        { "timestamp": "2025-09-01", "value": 398500 },
+        { "timestamp": "2025-10-01", "value": 399000 },
+        { "timestamp": "2025-11-01", "value": 399500 },
+        { "timestamp": "2025-11-10", "value": 400000 }
       ]
     }
   ]
