@@ -236,7 +236,7 @@ function renderTotal() {
 
 async function transitionFigure(node, newFigure) {
   node.style.position = 'relative'
-  const number = node.textContent.toString()
+  const currentNumber = node.textContent.toString()
   node.innerHTML = ''
 
   const transitionContainer = document.createElement('span')
@@ -250,11 +250,11 @@ async function transitionFigure(node, newFigure) {
 
   const speed = Math.round(300 / targetNumber.length)
 
-  for (let i = 0; i < number.length; i++) {
+  for (let i = 0; i < currentNumber.length; i++) {
     const subNumber = document.createElement('span')
     subNumber.style.display = 'inline-block'
     subNumber.style.transition = 'all 0.2s ease-in-out'
-    const char = number[i]
+    const char = currentNumber[i]
     subNumber.textContent = char
     transitionContainer.append(subNumber)
 
@@ -280,7 +280,7 @@ async function transitionFigure(node, newFigure) {
     }, speed * i + 1)
   }
 
-  await sleep((targetNumber.length + number.length) * speed)
+  await sleep((targetNumber.length + currentNumber.length) * speed)
 
   node.textContent = newFigure
 }
