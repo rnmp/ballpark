@@ -237,8 +237,9 @@ function renderTotal() {
 const cancellables = new Map()
 
 function transitionFigure(node, newFigure) {
-  if (cancellables.has(node)) {
-    cancellables.get(node)()
+  const cancellable = cancellables.get(node)
+  if (cancellable) {
+    cancellable()
   }
 
   node.style.position = 'relative'
@@ -293,6 +294,7 @@ function transitionFigure(node, newFigure) {
 
   const timeout = setTimeout(() => {
     node.textContent = newFigure
+    cancellables.delete(node)
   }, Math.max(targetNumber.length, currentNumber.length) * speed + 200)
   timeouts.push(timeout)
 
