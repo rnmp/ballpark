@@ -123,14 +123,11 @@ function setupConfigurationUI(cloudLocation) {
     let timeout = undefined
     codeButton.onclick = async () => {
       navigator.clipboard.writeText(cloudLocation)
-      if (timeout) {
-        return
-      }
 
+      clearTimeout(timeout)
       codeButton.textContent = 'Copied to clipboard'
       timeout = setTimeout(() => {
         codeButton.textContent = cloudLocation
-        clearTimeout(timeout)
       }, 2000)
     }
     actions.append(codeButton)
