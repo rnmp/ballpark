@@ -254,7 +254,7 @@ function transitionFigure(node, newFigure) {
   transitionDoppleganger.style.left = '0'
   node.append(transitionDoppleganger)
 
-  const speed = Math.round(300 / targetNumber.length)
+  const speed = targetNumber.length > 0 ? Math.max(10, Math.round(300 / targetNumber.length)) : 60
 
   const timeouts = []
 
@@ -293,7 +293,7 @@ function transitionFigure(node, newFigure) {
 
   const timeout = setTimeout(() => {
     node.textContent = newFigure
-  }, (targetNumber.length + currentNumber.length) * speed)
+  }, Math.max(targetNumber.length, currentNumber.length) * speed + 200)
   timeouts.push(timeout)
 
   cancellables.set(
