@@ -103,7 +103,7 @@ function setCloudStatus(status) {
 }
 
 window.updateCloudState = (data) => updateCloudState(getCloudLocation(), data)
-window.createCloudState = (data) => createCloudState(getCloudLocation(), data)
+window.createCloudState = (data) => createCloudState(data)
 window.getCloudState = () => getCloudState(getCloudLocation())
 
 function setupConfigurationUI(cloudLocation) {
