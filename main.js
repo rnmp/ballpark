@@ -234,7 +234,13 @@ function renderTotal() {
   transitionFigure($('#total'), money(total))
 }
 
-async function transitionFigure(node, newFigure) {
+const cancellables = new Map()
+
+function transitionFigure(node, newFigure) {
+  if (cancellables.has(node)) {
+    cancellables.get(node)()
+  }
+
   node.style.position = 'relative'
   const currentNumber = node.textContent.toString()
   node.innerHTML = ''
@@ -250,6 +256,8 @@ async function transitionFigure(node, newFigure) {
 
   const speed = Math.round(300 / targetNumber.length)
 
+  const timeouts = []
+
   for (let i = 0; i < currentNumber.length; i++) {
     const subNumber = document.createElement('span')
     subNumber.style.display = 'inline-block'
@@ -258,10 +266,11 @@ async function transitionFigure(node, newFigure) {
     subNumber.textContent = char
     transitionContainer.append(subNumber)
 
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       subNumber.style.transform = 'translateY(-50%) scale(0.2)'
       subNumber.style.opacity = 0
     }, speed * i + 1)
+    timeouts.push(timeout)
   }
 
   for (let i = 0; i < targetNumber.length; i++) {
@@ -274,15 +283,29 @@ async function transitionFigure(node, newFigure) {
     subNumber.textContent = char
     transitionDoppleganger.append(subNumber)
 
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       subNumber.style.transform = 'translateY(0%) scale(1.0)'
       subNumber.style.opacity = 1
     }, speed * i + 1)
+    timeouts.push(timeout)
   }
 
-  await sleep((targetNumber.length + currentNumber.length) * speed)
 
-  node.textContent = newFigure
+  const timeout = setTimeout(() => {
+    node.textContent = newFigure
+  }, (targetNumber.length + currentNumber.length) * speed)
+  timeouts.push(timeout)
+
+  cancellables.set(
+    node,
+    () => {
+      for (let ti = 0; ti < timeouts.length; ti++) {
+        clearTimeout(timeouts[ti])
+      }
+      node.textContent = newFigure
+      cancellables.delete(node)
+    }
+  )
 }
 
 function renderToolbar() {
