@@ -195,18 +195,22 @@ function setupConfigurationUI(cloudLocation) {
 }
 
 export function initializeCloud() {
-  document.addEventListener('data-committed', async () => {
-    const cloudLocation = getCloudLocation()
-    if (!cloudLocation) {
-      return
-    }
-    setCloudStatus('Syncing…')
-    const { success } = await updateCloudState(cloudLocation, getSnapshot())
-    if (success) {
-      setCloudStatus('')
-    } else {
-      setCloudStatus('Whoops…')
-    }
+  let syncTimeout
+  document.addEventListener('data-committed', () => {
+    clearTimeout(syncTimeout)
+    syncTimeout = setTimeout(async () => {
+      const cloudLocation = getCloudLocation()
+      if (!cloudLocation) {
+        return
+      }
+      setCloudStatus('Syncing…')
+      const { success } = await updateCloudState(cloudLocation, getSnapshot())
+      if (success) {
+        setCloudStatus('')
+      } else {
+        setCloudStatus('Whoops…')
+      }
+    }, 500)
   })
 
   const cloudLocation = getCloudLocation()
@@ -215,7 +219,7 @@ export function initializeCloud() {
   let checkedCloudStatusAt = undefined
 
   async function checkCloudStatus(opts = {}) {
-    if (!opts.force && checkedCloudStatusAt && checkedCloudStatusAt.getTime() > new Date().getTime() - (60_000) || !cloudLocation) {
+    if (!cloudLocation || !opts.force && checkedCloudStatusAt && checkedCloudStatusAt.getTime() > new Date().getTime() - 60_000) {
       return
     }
 
