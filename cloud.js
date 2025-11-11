@@ -139,14 +139,9 @@ function setupConfigurationUI(cloudLocation) {
     deleteButton.className = 'button'
     deleteButton.textContent = 'Delete'
     deleteButton.onclick = async () => {
-      const { success } = await deleteCloudState(cloudLocation)
-      if (success) {
-        deleteCloudLocation()
-        setupConfigurationUI()
-        return
-      }
-
-      feedback.textContent = 'Something went wrong trying to delete :('
+      await deleteCloudState(cloudLocation)
+      deleteCloudLocation()
+      setupConfigurationUI()
     }
     actions.append(deleteButton)
 
