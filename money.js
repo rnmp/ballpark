@@ -1,6 +1,17 @@
 import { getCurrency } from './data.js'
 
 export function sanitizeMoneyInput(str) {
+  // Try to evaluate as a math expression first
+  const cleaned = str.replace(/[^\d+\-*/().\s]/g, '')
+  try {
+    const result = Function('"use strict"; return (' + cleaned + ')')()
+    if (typeof result === 'number' && !isNaN(result)) {
+      return Math.round(result)
+    }
+  } catch (e) {
+    // If evaluation fails, fall back to original parsing
+  }
+
   return parseInt(str.split('.')[0].replace(/\D/g, '')) || 0
 }
 
