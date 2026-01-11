@@ -2,14 +2,19 @@ import { getCurrency } from './data.js'
 
 export function sanitizeMoneyInput(str) {
   // Try to evaluate as a math expression first
-  const cleaned = str.replace(/[^\d+\-*/().\s]/g, '')
-  try {
-    const result = Function('"use strict"; return (' + cleaned + ')')()
-    if (typeof result === 'number' && !isNaN(result)) {
-      return Math.round(result)
+  // Remove currency symbols, commas, spaces but keep numbers and operators
+  const cleaned = str.replace(/[\$,\s]/g, '').replace(/[^\d+\-*/.()]/g, '')
+
+  // Check if this looks like a math expression (contains operators)
+  if (/[+\-*/]/.test(cleaned) && cleaned.length > 1) {
+    try {
+      const result = Function('"use strict"; return (' + cleaned + ')')()
+      if (typeof result === 'number' && !isNaN(result)) {
+        return Math.round(result)
+      }
+    } catch (e) {
+      // If evaluation fails, fall back to original parsing
     }
-  } catch (e) {
-    // If evaluation fails, fall back to original parsing
   }
 
   return parseInt(str.split('.')[0].replace(/\D/g, '')) || 0
