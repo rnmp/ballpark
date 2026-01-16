@@ -68,13 +68,21 @@ export function produceHistory(value) {
 
 export function createAccount({ name, accountType, balance }) {
   const snapshot = getSnapshot()
-  snapshot.accounts.push({
+  const newAccount = {
     id: crypto.randomUUID(),
     name,
     account_type: accountType,
     value: balance,
     history: [produceHistory(balance)],
-  })
+  }
+
+  // If custom ordering is enabled, assign order to new account
+  if (snapshot.customOrderEnabled) {
+    const maxOrder = Math.max(...snapshot.accounts.map(a => a.order || 0), -1)
+    newAccount.order = maxOrder + 1
+  }
+
+  snapshot.accounts.push(newAccount)
   commit(snapshot)
 }
 

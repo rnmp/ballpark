@@ -1,16 +1,30 @@
 import { money } from './money.js'
 
-export function editableText(node, text, save) {
+export function editableText(node, text, save, wrapper) {
   node.classList.toggle('editable-text', true)
 
   const input = make('input')
   input.value = text
+
+  // Disable dragging when editing starts
+  input.onfocus = () => {
+    if (wrapper) {
+      wrapper.draggable = false
+    }
+  }
+
   input.onblur = () => {
+    // Re-enable dragging when editing ends
+    if (wrapper) {
+      wrapper.draggable = true
+    }
+
     if (input.value === text) {
       return
     }
     save(input.value)
   }
+
   input.onkeydown = (event) => {
     if (event.key === 'Enter') {
       input.blur()

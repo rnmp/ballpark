@@ -27,6 +27,9 @@ let activeIcon = undefined;
 const accountRows = new Map()
 const accountsList = $('#accounts')
 
+let dragSession = {}
+let customOrderEnabled = false
+
 $('#undo').addEventListener('click', () => {
   undo()
   renderEverything()
@@ -140,6 +143,14 @@ $('#settings_button').addEventListener('click', () => {
   const snapshot = getSnapshot()
   $('#currency_selector').value = snapshot.currency || 'USD'
 
+  // Show/hide reset ordering button based on whether custom ordering is enabled
+  const orderingSection = $('#account_ordering_section')
+  if (snapshot.customOrderEnabled) {
+    orderingSection.style.display = 'block'
+  } else {
+    orderingSection.style.display = 'none'
+  }
+
   presentModal(settingsModal)
 })
 
@@ -190,6 +201,30 @@ $('#reset_data_button').addEventListener('click', () => {
   renderEverything()
   activeModal.classList.remove('shown')
   welcomeUser()
+})
+
+$('#reset_ordering_button').addEventListener('click', () => {
+  const snapshot = getSnapshot()
+
+  // Remove custom ordering
+  snapshot.customOrderEnabled = false
+  snapshot.accounts.forEach(account => {
+    delete account.order
+  })
+
+  commit(snapshot)
+  renderEverything()
+
+  // Hide the ordering section after reset
+  $('#account_ordering_section').style.display = 'none'
+
+  // Show feedback
+  const button = $('#reset_ordering_button')
+  const originalText = button.textContent
+  button.textContent = 'Reset Successful!'
+  setTimeout(() => {
+    button.textContent = originalText
+  }, 2000)
 })
 
 newAccountForm.addEventListener('submit', (e) => {
@@ -324,6 +359,162 @@ function renderEverything() {
 }
 
 
+// Drag and drop handlers (adapted from Coleure)
+function handleDragStart(e) {
+  e.dataTransfer.effectAllowed = 'move'
+  const draggingElement = e.currentTarget
+  draggingElement.style.opacity = '0.3'
+
+  const parent = Array.from(accountsList.children)
+  const draggingIndex = parent.indexOf(draggingElement)
+
+  // Capture regions before any transforms
+  dragSession.regions = parent.map((el, i) => ({
+    index: i,
+    rect: el.getBoundingClientRect(),
+    element: el
+  }))
+  dragSession.draggingElement = draggingElement
+  dragSession.draggingIndex = draggingIndex
+  dragSession.insertionIndex = draggingIndex
+
+  e.dataTransfer.setData('text', draggingIndex)
+}
+
+function handleDragOver(e) {
+  e.preventDefault()
+  if (!dragSession.regions) return
+
+  // Find insertion index based on mouse Y position
+  let newInsertionIndex = dragSession.regions.length
+  for (let i = 0; i < dragSession.regions.length; i++) {
+    const region = dragSession.regions[i]
+    const midpoint = region.rect.top + region.rect.height / 2
+    if (e.clientY < midpoint) {
+      newInsertionIndex = i
+      break
+    }
+  }
+
+  // Only recalculate if insertion point changed
+  if (newInsertionIndex === dragSession.insertionIndex) return
+  dragSession.insertionIndex = newInsertionIndex
+
+  // Recalculate all transforms
+  dragSession.regions.forEach(({ index, element, rect }) => {
+    if (index === dragSession.draggingIndex) return
+
+    const shiftAmount = rect.height
+    let shouldShift = false
+
+    if (dragSession.draggingIndex < dragSession.insertionIndex) {
+      // Dragging downward: shift elements between original and insertion up
+      shouldShift = index > dragSession.draggingIndex && index < dragSession.insertionIndex
+    } else {
+      // Dragging upward: shift elements between insertion and original down
+      shouldShift = index < dragSession.draggingIndex && index >= dragSession.insertionIndex
+    }
+
+    element.style.transform = shouldShift
+      ? `translateY(${dragSession.draggingIndex < dragSession.insertionIndex ? -shiftAmount : shiftAmount}px)`
+      : ''
+  })
+
+  return false
+}
+
+function handleDrop(e) {
+  e.preventDefault()
+
+  // Reorder if insertion point changed
+  if (dragSession.insertionIndex !== undefined && dragSession.insertionIndex !== dragSession.draggingIndex) {
+    const snapshot = getSnapshot()
+
+    // Enable custom ordering
+    snapshot.customOrderEnabled = true
+
+    // Assign order values if not already present
+    if (!snapshot.accounts.some(a => a.order !== undefined)) {
+      // Get accounts in current visual order
+      const visualOrder = Array.from(accountsList.children).map(el => el.dataset.accountId)
+      visualOrder.forEach((id, index) => {
+        const account = snapshot.accounts.find(a => a.id === id)
+        if (account) account.order = index
+      })
+    }
+
+    // Get account being moved
+    const draggedAccountId = dragSession.draggingElement.dataset.accountId
+    const draggedAccount = snapshot.accounts.find(a => a.id === draggedAccountId)
+
+    // Calculate new order values
+    const visualOrder = Array.from(accountsList.children).map(el => el.dataset.accountId)
+    const [movedId] = visualOrder.splice(dragSession.draggingIndex, 1)
+
+    // Insert at new position
+    const adjustedIndex = dragSession.insertionIndex > dragSession.draggingIndex
+      ? dragSession.insertionIndex - 1
+      : dragSession.insertionIndex
+    visualOrder.splice(adjustedIndex, 0, movedId)
+
+    // Update order values
+    visualOrder.forEach((id, index) => {
+      const account = snapshot.accounts.find(a => a.id === id)
+      if (account) account.order = index
+    })
+
+    // Sort accounts by new order
+    snapshot.accounts.sort((a, b) => (a.order || 0) - (b.order || 0))
+
+    commit(snapshot)
+
+    // Reset all transforms
+    if (dragSession.regions) {
+      dragSession.regions.forEach(({ element }) => {
+        element.style.transition = 'none'
+        element.style.transform = ''
+      })
+    }
+
+    // Rearrange DOM elements
+    const children = Array.from(accountsList.children)
+    if (adjustedIndex >= children.length) {
+      accountsList.appendChild(dragSession.draggingElement)
+    } else {
+      if (dragSession.insertionIndex > dragSession.draggingIndex) {
+        children[adjustedIndex].after(dragSession.draggingElement)
+      } else {
+        children[adjustedIndex].before(dragSession.draggingElement)
+      }
+    }
+  }
+
+  return false
+}
+
+function handleDragEnd(e) {
+  e.preventDefault()
+  if (dragSession.regions) {
+    dragSession.regions.forEach(({ element }) => {
+      element.style.transform = ''
+      element.style.removeProperty('transition')
+    })
+  }
+
+  if (dragSession.draggingElement) {
+    dragSession.draggingElement.style.opacity = '1'
+  }
+  dragSession = {}
+}
+
+function handleDragEnter(e) {
+  e.preventDefault()
+}
+
+function handleDragLeave(e) {
+  e.preventDefault()
+}
+
 $('#delete_account_button').addEventListener('click', async () => {
   if (!activeAccount) {
     return
@@ -350,7 +541,20 @@ $('#delete_account_button').addEventListener('click', async () => {
 
 function renderAccount(account) {
   const wrapper = make('div')
-  wrapper.className = 'flex gap-3 items-center pl-6 border-t-0.5 transition-all h-18'
+  wrapper.className = 'account-row flex gap-3 items-center pl-6 border-t-0.5 transition-all h-18'
+  wrapper.style.position = 'relative'
+  wrapper.draggable = true
+  wrapper.dataset.accountId = account.id
+
+  // Add drag handle (positioned absolutely in the left padding area)
+  const dragHandle = make('div')
+  dragHandle.className = 'drag-handle'
+  dragHandle.innerHTML = '⋮⋮'
+  wrapper.append(dragHandle)
+
+  // Drag event listeners
+  wrapper.addEventListener('dragstart', handleDragStart)
+  wrapper.addEventListener('dragend', handleDragEnd)
 
   const icon = make('div')
   icon.className = 'button p-0 font-lg size-10 flex items-center justify-center rounded-full'
@@ -394,7 +598,8 @@ function renderAccount(account) {
       account.name = newName
 
       renderToolbar()
-    }
+    },
+    wrapper
   )
 
   const balance = make('h2')
@@ -418,7 +623,8 @@ function renderAccount(account) {
       document.dispatchEvent(new CustomEvent('account-balance-changed', {
         detail: { updatedAccount }
       }))
-    }
+    },
+    wrapper
   )
 
   const options = make('div')
@@ -462,20 +668,27 @@ document.addEventListener('account-balance-changed', (e) => {
   const accountRow = accountRows.get(accountId)
   const newAccountRow = renderAccount(updatedAccount)
 
-  const sortedAccounts = getSnapshot()
-    .accounts
-    .toSorted((a, b) => accountValue(b) - accountValue(a))
-  const accountIndex = sortedAccounts.findIndex(a => a.id === accountId)
-  const prevAccountId = sortedAccounts.at(accountIndex + 1)?.id
-  const prevAccountRow = accountRows.get(prevAccountId)
+  const snapshot = getSnapshot()
 
-  if (prevAccountRow) {
-    accountsList.insertBefore(newAccountRow, prevAccountRow)
-    accountsList.removeChild(accountRow)
-  } else if (accountRow.nextSibling) {
-    accountRow.nextSibling.after(newAccountRow)
-    accountsList.removeChild(accountRow)
+  // Only reorder if custom ordering is not enabled
+  if (!snapshot.customOrderEnabled) {
+    const sortedAccounts = snapshot.accounts
+      .toSorted((a, b) => accountValue(b) - accountValue(a))
+    const accountIndex = sortedAccounts.findIndex(a => a.id === accountId)
+    const prevAccountId = sortedAccounts.at(accountIndex + 1)?.id
+    const prevAccountRow = accountRows.get(prevAccountId)
+
+    if (prevAccountRow) {
+      accountsList.insertBefore(newAccountRow, prevAccountRow)
+      accountsList.removeChild(accountRow)
+    } else if (accountRow.nextSibling) {
+      accountRow.nextSibling.after(newAccountRow)
+      accountsList.removeChild(accountRow)
+    } else {
+      accountsList.replaceChild(newAccountRow, accountRow)
+    }
   } else {
+    // When custom ordering is enabled, just replace in place
     accountsList.replaceChild(newAccountRow, accountRow)
   }
 
@@ -486,9 +699,18 @@ document.addEventListener('account-balance-changed', (e) => {
 })
 
 function renderAccounts() {
-  const sortedAccounts = getSnapshot()
-    .accounts
-    .toSorted((a, b) => accountValue(b) - accountValue(a))
+  const snapshot = getSnapshot()
+  customOrderEnabled = snapshot.customOrderEnabled || false
+
+  let sortedAccounts
+  if (customOrderEnabled && snapshot.accounts.some(a => a.order !== undefined)) {
+    // Use custom order if enabled
+    sortedAccounts = snapshot.accounts.toSorted((a, b) => (a.order || 0) - (b.order || 0))
+  } else {
+    // Default sorting by value (highest first)
+    sortedAccounts = snapshot.accounts.toSorted((a, b) => accountValue(b) - accountValue(a))
+  }
+
   let accountUIs = []
 
   for (const account of sortedAccounts) {
@@ -544,5 +766,9 @@ function initialize() {
   populateAccountEmojiSelector()
   renderEverything()
   initializeCloud()
+
+  // Add drag event listeners to the accounts container
+  accountsList.addEventListener('dragover', handleDragOver)
+  accountsList.addEventListener('drop', handleDrop)
 }
 initialize()

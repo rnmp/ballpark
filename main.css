@@ -61,6 +61,39 @@ a {
   color: inherit;
 }
 
+/* Drag and drop styles */
+.drag-handle {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.2s;
+  user-select: none;
+  -webkit-user-select: none;
+  padding: 0.33rem;
+  font-size: 1.2rem;
+  color: var(--text-color);
+}
+
+.account-row:hover .drag-handle {
+  opacity: 1;
+}
+
+.drag-handle:hover {
+  opacity: 1 !important;
+}
+
+.dragging {
+  cursor: grabbing;
+}
+
+.account-row {
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+  position: relative;
+}
+
 .button {
   user-select: none;
   -webkit-user-select: none;
