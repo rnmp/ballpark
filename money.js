@@ -10,7 +10,7 @@ export function sanitizeMoneyInput(str) {
     try {
       const result = Function('"use strict"; return (' + cleaned + ')')()
       if (typeof result === 'number' && !isNaN(result)) {
-        return Math.round(result)
+        return Math.abs(Math.round(result))
       }
     } catch (e) {
       // If evaluation fails, fall back to original parsing
@@ -40,7 +40,7 @@ export function money(int, mode) {
     notation: "compact",
   })
 
-  let value = account.format(int) 
+  let value = account.format(int)
 
   if (mode === 'compact') {
     value = compact.format(int)
@@ -50,5 +50,5 @@ export function money(int, mode) {
     value = value.replace('S/', 'S/.')
   }
 
-  return value 
+  return value
 }
